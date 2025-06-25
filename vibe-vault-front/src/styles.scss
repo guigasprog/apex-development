@@ -1,0 +1,236 @@
+/* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&family=Varta:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Russo+One&family=Varta:wght@300..700&display=swap");
+
+$black-matte: #1c1c1c; // Background main color
+$dark-gray: #3a3a3a; // Secondary elements
+$worn-yellow: #d4af37; // Highlights, buttons, and accents
+$metallic-gray: #b0b0b0; // Borders and icon details
+$white: #ffffff; // Text and high-contrast elements
+$rustic-brown: #7c4a24; // Details
+$disabled-text: #8d8d8d;
+
+$russo: "Russo One", sans-serif;
+$exo: "Exo 2", sans-serif;
+
+* {
+  margin: 0;
+  padding: 0;
+  color: $white;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  background-color: $black-matte;
+  overflow: hidden;
+}
+
+@media (max-width: 500px) {
+  body {
+    width: 100%;
+    height: 100%;
+    background-color: $black-matte;
+    overflow-y: visible !important;
+  }
+}
+
+a {
+  font-family: $exo;
+  text-decoration: underline;
+  color: $worn-yellow;
+  cursor: pointer;
+}
+
+.title {
+  font-family: $russo;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.subtitle {
+  font-family: $exo;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 15px;
+  text-align: center;
+  color: $white;
+}
+
+span {
+  font-family: $exo;
+}
+
+.strong {
+  font-family: $russo;
+  color: $metallic-gray;
+  font-weight: 400;
+}
+
+.content-text {
+  font-family: $exo;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.container-100vw {
+  width: 100%;
+}
+
+.input-container {
+  position: relative;
+  margin: 30px auto;
+  width: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  span {
+    font-family: $exo;
+  }
+}
+
+.button-container {
+  position: relative;
+  margin: 10px auto;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-container input {
+  font-size: 20px;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid $metallic-gray;
+  padding: 5px 0;
+  background-color: transparent;
+  outline: none;
+  font-family: $exo;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.input-container .label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: $white;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  font-family: $exo;
+  font-size: 15px;
+}
+
+.input-container input[type="date"] ~ .label {
+  top: -20px !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Movimentação da label no estado de foco ou de campo preenchido */
+.input-container input:focus ~ .label,
+.input-container input:valid ~ .label {
+  top: -20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $metallic-gray;
+}
+
+/* Estilização da underline animada */
+.input-container .underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: $metallic-gray;
+  transform: scaleX(0);
+  transition: all 0.3s ease;
+}
+
+/* Animação da underline no estado de foco ou de campo preenchido */
+.input-container input:focus ~ .underline,
+.input-container input:valid ~ .underline {
+  transform: scaleX(1);
+}
+
+/* Estilização específica para checkbox, se necessário */
+.input-container input[type="checkbox"]:focus ~ .checkbox,
+.input-container input[type="checkbox"]:valid ~ .checkbox {
+  width: 1300px;
+  top: -20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: $exo;
+  color: $white;
+}
+
+.text-derecoration-line {
+  text-decoration-line: underline;
+  color: $metallic-gray;
+  font-weight: 600;
+}
+
+button {
+  margin: 5px;
+  width: auto;
+  text-align: right;
+  background-color: transparent;
+  border: 0;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: $exo;
+  cursor: pointer;
+  span {
+    svg path {
+      fill: $black-matte;
+    }
+    color: $black-matte;
+  }
+}
+
+button:disabled {
+  background-color: $metallic-gray;
+  cursor: default;
+  span {
+    svg path {
+      fill: $disabled-text !important;
+    }
+    color: $disabled-text !important;
+  }
+}
+
+.btn {
+  margin: 5px;
+  width: 264px;
+  height: 48px;
+  text-align: right;
+  background-color: transparent;
+  border: 0;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: $exo;
+  cursor: pointer;
+  span {
+    color: $black-matte;
+  }
+}
+
+.btn-primary {
+  background-color: $worn-yellow;
+}
+
+.btn-secondary {
+  transition: all 200ms;
+  background-color: $metallic-gray;
+  color: $white;
+  border-color: $metallic-gray;
+}
+
+.btn-secondary:hover {
+  background-color: $metallic-gray;
+  border-color: $metallic-gray;
+}
