@@ -13,7 +13,7 @@ class ImagensProduto extends TRecord
         parent::__construct($id);
 
         parent::addAttribute('produto_id');
-        parent::addAttribute('imagem');
+        parent::addAttribute('image_url');
         parent::addAttribute('descricao');
     }
 }

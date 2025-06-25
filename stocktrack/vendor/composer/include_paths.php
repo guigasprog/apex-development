@@ -6,8 +6,8 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    $vendorDir . '/adianti/pdfdesigner',
     $vendorDir . '/pablodalloglio/fpdf',
+    $vendorDir . '/adianti/pdfdesigner',
     $vendorDir . '/pablodalloglio/ole',
     $vendorDir . '/pablodalloglio/spreadsheet_excel_writer',
 );

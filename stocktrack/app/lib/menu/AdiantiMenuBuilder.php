@@ -20,10 +20,6 @@ class AdiantiMenuBuilder
                 $menu_string = ob_get_clean();
                 return $menu_string;
                 break;
-            case 'adminbs5':
-                $xml  = new SimpleXMLElement(file_get_contents($file));
-            case 'adminbs5_v2':
-                $xml  = new SimpleXMLElement(file_get_contents($file));
             default:
                 ob_start();
                 $xml = new SimpleXMLElement(file_get_contents($file));

@@ -1,86 +1,99 @@
--- DROP DB se já existir
-DROP DATABASE IF EXISTS stocktrack_db;
 
--- CRIA DB
-CREATE DATABASE stocktrack_db;
+DROP DATABASE IF EXISTS `vibe_vault`;
 
--- USA DB
-USE stocktrack_db;
+CREATE DATABASE `vibe_vault` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- CRIA TABELA DE ENDEREÇOS
-CREATE TABLE enderecos (
-    idEndereco INT AUTO_INCREMENT PRIMARY KEY,
-    logradouro VARCHAR(100),
-    numero VARCHAR(10),
-    complemento VARCHAR(50),
-    bairro VARCHAR(50),
-    cidade VARCHAR(50),
-    estado VARCHAR(2),
-    cep VARCHAR(9)
-);
+USE `vibe_vault`;
 
--- CRIA TABELA DE CLIENTES
-CREATE TABLE clientes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    telefone VARCHAR(20),
-    cpf VARCHAR(14) NOT NULL UNIQUE,
-    endereco_id INT,
-    FOREIGN KEY (endereco_id) REFERENCES enderecos(idEndereco) ON DELETE CASCADE
-);
+CREATE TABLE `enderecos` (
+  `idEndereco` INT AUTO_INCREMENT PRIMARY KEY,
+  `logradouro` VARCHAR(100) NULL,
+  `numero` VARCHAR(10) NULL,
+  `complemento` VARCHAR(50) NULL,
+  `bairro` VARCHAR(50) NULL,
+  `cidade` VARCHAR(50) NULL,
+  `estado` VARCHAR(2) NULL,
+  `cep` VARCHAR(9) NULL
+) ENGINE=InnoDB;
 
--- CRIA TABELA DE CATEGORIAS
-CREATE TABLE categorias (
-    idCategoria INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    descricao TEXT
-);
+CREATE TABLE `clientes` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  `email` VARCHAR(100) NOT NULL UNIQUE,
+  `telefone` VARCHAR(20) NULL,
+  `cpf` VARCHAR(14) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `endereco_id` INT NULL,
+  CONSTRAINT `fk_cliente_endereco`
+    FOREIGN KEY (`endereco_id`)
+    REFERENCES `enderecos` (`idEndereco`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- CRIA TABELA DE PRODUTOS
-CREATE TABLE produtos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL,
-    descricao TEXT,
-    validade DATE,
-    preco DECIMAL(10, 2) NOT NULL,
-    categoria_id INT,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(idCategoria) ON DELETE SET NULL
-);
+CREATE TABLE `categorias` (
+  `idCategoria` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  `descricao` TEXT NULL
+) ENGINE=InnoDB;
 
--- TABELA DE PEDIDOS
-CREATE TABLE pedidos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT NOT NULL,
-    data_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total DECIMAL(10, 2) NOT NULL,
-    status ENUM('pendente', 'concluído', 'cancelado', 'pagamento efetuado', 'enviado para entrega') DEFAULT 'pendente',
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
-);
+CREATE TABLE `produtos` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `nome` VARCHAR(255) NOT NULL,
+  `descricao` TEXT NULL,
+  `validade` DATE NULL,
+  `preco` DECIMAL(10, 2) NOT NULL,
+  `categoria_id` INT NULL,
+  CONSTRAINT `fk_produto_categoria`
+    FOREIGN KEY (`categoria_id`)
+    REFERENCES `categorias` (`idCategoria`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- TABELA DE ITENS DO PEDIDO (MANY-TO-MANY ENTRE PEDIDOS E PRODUTOS)
-CREATE TABLE pedido_produto (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    pedido_id INT NOT NULL,
-    produto_id INT NOT NULL,
-    quantidade INT NOT NULL,
-    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
-    FOREIGN KEY (produto_id) REFERENCES produtos(id)
-);
+CREATE TABLE `pedidos` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `cliente_id` INT NOT NULL,
+  `data_pedido` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `total` DECIMAL(10, 2) NOT NULL,
+  `status` ENUM('pendente', 'concluído', 'cancelado', 'pagamento efetuado', 'enviado para entrega') DEFAULT 'pendente',
+  CONSTRAINT `fk_pedido_cliente`
+    FOREIGN KEY (`cliente_id`)
+    REFERENCES `clientes` (`id`)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- CRIA TABELA DE ESTOQUE USANDO produto_id COMO PRIMARY KEY
-CREATE TABLE estoque (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    produto_id INT,
-    quantidade INT NOT NULL,
-    data_entrada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (produto_id) REFERENCES produtos(id)
-);
+CREATE TABLE `estoque` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `produto_id` INT NOT NULL,
+  `quantidade` INT NOT NULL,
+  `data_entrada` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_estoque_produto`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `produtos` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
-CREATE TABLE imagens_produto (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    produto_id INT NOT NULL,
-    descricao VARCHAR(255) NOT NULL,
-    imagem LONGBLOB NOT NULL,
-    FOREIGN KEY (produto_id) REFERENCES produtos(id) ON DELETE CASCADE
-);
+CREATE TABLE `imagens_produto` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `produto_id` INT NOT NULL,
+  `image_url` VARCHAR(255) NOT NULL,
+  `descricao` VARCHAR(255) NULL,
+  CONSTRAINT `fk_imagem_produto`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `produtos` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE `pedido_produto` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `pedido_id` INT NOT NULL,
+  `produto_id` INT NOT NULL,
+  `quantidade` INT NOT NULL,
+  CONSTRAINT `fk_pedprod_pedido`
+    FOREIGN KEY (`pedido_id`)
+    REFERENCES `pedidos` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_pedprod_produto`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `produtos` (`id`)
+    ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;

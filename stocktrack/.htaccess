@@ -1,0 +1,21 @@
+# Ativa o motor de reescrita de URL
+RewriteEngine On
+
+# Define o caminho base para a reescrita de URL.
+# Esta linha informa ao Apache que a aplicação está em /vibe-vault/stocktrack/
+RewriteBase /vibe-vault/stocktrack/
+
+# Impede o acesso direto a diretórios
+Options -Indexes
+
+# Bloqueia o acesso a diretórios sensíveis, mas permite o acesso a recursos específicos.
+# Esta é a principal correção. Estamos permitindo o acesso às pastas que contêm CSS/JS.
+RewriteRule ^(app/config|app/control|app/model|app/service|app/database) - [F]
+RewriteRule ^(lib/adianti/include/.*\.txt) - [F]
+RewriteRule ^(vendor|lib|bin|tmp)($|/$) - [F]
+RewriteRule ^(composer\.json|composer\.lock|app/config/.*\.ini) - [F]
+
+# Permite que o Adianti Framework gerencie o roteamento para todo o resto
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?class=$1 [L,QSA]

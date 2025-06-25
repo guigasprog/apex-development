@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2
+class ComposerStaticInit3c5cc7b578a3375d0ee2435d6e0c1164
 {
     public static $files = array (
         'a4ecaeafb8cfb009ad0e052c90355e98' => __DIR__ . '/..' . '/beberlei/assert/lib/Assert/functions.php',
@@ -255,11 +255,6 @@ class ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Datamatrix' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/datamatrix.php',
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
-        'FPDF_TPL' => __DIR__ . '/..' . '/setasign/fpdi/fpdf_tpl.php',
-        'FPDI' => __DIR__ . '/..' . '/setasign/fpdi/fpdi.php',
-        'FilterASCII85' => __DIR__ . '/..' . '/setasign/fpdi/filters/FilterASCII85.php',
-        'FilterASCIIHexDecode' => __DIR__ . '/..' . '/setasign/fpdi/filters/FilterASCIIHexDecode.php',
-        'FilterLZW' => __DIR__ . '/..' . '/setasign/fpdi/filters/FilterLZW.php',
         'PDF417' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/pdf417.php',
         'QRcode' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/barcodes/qrcode.php',
         'Safe\\DateTime' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTime.php',
@@ -357,10 +352,7 @@ class ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2
         'TCPDF_FONTS' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/tcpdf_fonts.php',
         'TCPDF_FONT_DATA' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/tcpdf_font_data.php',
         'TCPDF_IMAGES' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/tcpdf_images.php',
-        'TCPDF_IMPORT' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_import.php',
-        'TCPDF_PARSER' => __DIR__ . '/..' . '/tecnickcom/tcpdf/tcpdf_parser.php',
         'TCPDF_STATIC' => __DIR__ . '/..' . '/tecnickcom/tcpdf/include/tcpdf_static.php',
-        'fpdi_pdf_parser' => __DIR__ . '/..' . '/setasign/fpdi/fpdi_pdf_parser.php',
         'pQuery' => __DIR__ . '/..' . '/tburry/pquery/pQuery.php',
         'pQuery\\AspEmbeddedNode' => __DIR__ . '/..' . '/tburry/pquery/gan_node_html.php',
         'pQuery\\CSSQueryTokenizer' => __DIR__ . '/..' . '/tburry/pquery/gan_selector_html.php',
@@ -380,16 +372,15 @@ class ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2
         'pQuery\\TokenizerBase' => __DIR__ . '/..' . '/tburry/pquery/gan_tokenizer.php',
         'pQuery\\XML2ArrayParser' => __DIR__ . '/..' . '/tburry/pquery/gan_xml2array.php',
         'pQuery\\XmlNode' => __DIR__ . '/..' . '/tburry/pquery/gan_node_html.php',
-        'pdf_context' => __DIR__ . '/..' . '/setasign/fpdi/pdf_context.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit4074d5b77a855dbfd71e43da22fa21e2::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit3c5cc7b578a3375d0ee2435d6e0c1164::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit3c5cc7b578a3375d0ee2435d6e0c1164::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit3c5cc7b578a3375d0ee2435d6e0c1164::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit3c5cc7b578a3375d0ee2435d6e0c1164::$classMap;
 
         }, null, ClassLoader::class);
     }

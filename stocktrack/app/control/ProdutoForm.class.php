@@ -52,7 +52,7 @@ class ProdutoForm extends TPage
                                        [new TLabel('Validade (se tiver)'), $validade]);
         $row->layout = ['col-sm-6', 'col-sm-6'];
 
-        $row = $this->form->addFields([new TLabel('Categoria<span style="color: #a00000">*</span>'), $categorias]);
+        $row = $this->form->addFields([new TLabel('Categoria'), $categorias]);
         $row->layout = ['col-sm-12'];
     }
 
