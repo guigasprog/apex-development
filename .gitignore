@@ -3,6 +3,7 @@
 /server/auth-service/node_modules/
 /server/api-service/node_modules/
 /server/order-service/node_modules/
+/server/shipping-service/node_modules/
 
 /vendor/
 /stocktrack/vendor/

@@ -2,20 +2,34 @@
 RewriteEngine On
 
 # Define o caminho base para a reescrita de URL.
-# Esta linha informa ao Apache que a aplicação está em /vibe-vault/stocktrack/
 RewriteBase /vibe-vault/stocktrack/
 
-# Impede o acesso direto a diretórios
+# Impede a listagem de arquivos em diretórios (Boa prática de segurança)
 Options -Indexes
 
-# Bloqueia o acesso a diretórios sensíveis, mas permite o acesso a recursos específicos.
-# Esta é a principal correção. Estamos permitindo o acesso às pastas que contêm CSS/JS.
-RewriteRule ^(app/config|app/control|app/model|app/service|app/database) - [F]
-RewriteRule ^(lib/adianti/include/.*\.txt) - [F]
-RewriteRule ^(vendor|lib|bin|tmp)($|/$) - [F]
-RewriteRule ^(composer\.json|composer\.lock|app/config/.*\.ini) - [F]
+# --- INÍCIO DA CORREÇÃO ---
 
-# Permite que o Adianti Framework gerencie o roteamento para todo o resto
+# 1. BLOQUEAR primeiro o acesso direto a diretórios e arquivos sensíveis
+# O F significa "Forbidden", e o L significa "Last rule" (não processar mais regras).
+# NC ignora case (maiúsculas/minúsculas).
+
+# Bloqueia o acesso a diretórios de código fonte e dados
+RewriteRule ^app/(config|database|control|model|service) - [F,NC,L]
+RewriteRule ^(bin|tmp|vendor) - [F,NC,L]
+
+# Bloqueia o acesso a arquivos de configuração específicos
+RewriteRule \.(db|ini|log)$ - [F,NC,L]
+RewriteRule ^(composer\.json|composer\.lock)$ - [F,NC,L]
+
+# 2. PERMITIR o acesso a arquivos que existem fisicamente
+#    Se a requisição for para um arquivo (-f) ou diretório (-d) que existe de verdade,
+#    a regra de roteamento para o Adianti (abaixo) será ignorada e o Apache servirá o arquivo.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+
+# 3. ROTEAMENTO PARA O ADIANTI
+#    Se a requisição passou por todos os filtros acima (não foi bloqueada e não é um arquivo/pasta real),
+#    então ela é enviada para o index.php do Adianti para ser tratada como uma rota de classe.
 RewriteRule ^(.*)$ index.php?class=$1 [L,QSA]
+
+# --- FIM DA CORREÇÃO ---

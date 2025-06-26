@@ -13,8 +13,13 @@ class Produto extends TRecord
         parent::__construct($id);
         parent::addAttribute('nome');
         parent::addAttribute('descricao');
+        parent::addAttribute('sobre_o_item');
         parent::addAttribute('validade');
         parent::addAttribute('preco');
+        parent::addAttribute('peso_kg');
+        parent::addAttribute('comprimento_cm');
+        parent::addAttribute('altura_cm');
+        parent::addAttribute('largura_cm');
         parent::addAttribute('categoria_id');
     }
     

@@ -1,8 +1,27 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './representation/pages/login/login.component';
-import { PrincipalComponent } from './representation/pages/principal/principal.component';
+
+import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { HomeComponent } from './features/home/home.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { ProductDetailComponent } from './features/products/product-detail/product-detail.component';
 
 export const routes: Routes = [
-  { path: '', component: PrincipalComponent },
-  { path: 'login', component: LoginComponent },
+  {
+    path: '',
+    component: MainLayoutComponent,
+    children: [
+      { path: '', component: HomeComponent, title: 'Vibe Vault - Início' },
+      {
+        path: 'product/:id',
+        component: ProductDetailComponent,
+        title: 'Detalhes do Produto',
+      },
+    ],
+  },
+  {
+    path: 'login',
+    component: LoginComponent,
+    title: 'Vibe Vault - Login',
+  },
+  { path: '**', redirectTo: '', pathMatch: 'full' },
 ];

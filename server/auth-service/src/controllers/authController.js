@@ -8,7 +8,7 @@ const generateToken = (id) => {
 };
 
 exports.register = async (req, res) => {
-  const t = await sequelize.transaction(); // Inicia a transação
+  const t = await sequelize.transaction();
   
   try {
     const { nome, email, password, cpf, telefone, ...enderecoData } = req.body;
@@ -19,7 +19,6 @@ exports.register = async (req, res) => {
       return res.status(400).send({ error: 'Este e-mail já está em uso.' });
     }
 
-    // 1. Cria o endereço dentro da transação
     const novoEndereco = await Endereco.create({
       logradouro: enderecoData.logradouro,
       numero: enderecoData.numero,
@@ -30,7 +29,6 @@ exports.register = async (req, res) => {
       cep: enderecoData.cep,
     }, { transaction: t });
 
-    // 2. Cria o cliente com o ID do novo endereço, dentro da mesma transação
     const cliente = await Cliente.create({
       nome,
       email,
@@ -40,7 +38,6 @@ exports.register = async (req, res) => {
       endereco_id: novoEndereco.idEndereco
     }, { transaction: t });
 
-    // Se tudo deu certo, confirma a transação
     await t.commit();
 
     const clienteResult = cliente.toJSON();
@@ -61,7 +58,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    // No login, também trazemos o endereço associado
     const cliente = await Cliente.findOne({ 
       where: { email },
       include: [{ model: Endereco, as: 'endereco' }]

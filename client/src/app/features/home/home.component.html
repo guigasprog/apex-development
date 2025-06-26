@@ -1,0 +1,42 @@
+<div class="container mx-auto px-4 py-8">
+  <section class="text-center py-16 px-6 bg-brand-surface rounded-lg">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-white">
+      Encontre sua <span class="text-brand-accent">Vibe</span>.
+    </h1>
+    <p class="mt-4 max-w-2xl mx-auto text-lg text-brand-text-secondary">
+      Exploramos o mundo para encontrar peças únicas que contam uma história.
+      Bem-vindo ao seu cofre de estilo.
+    </p>
+    <a
+      href="#"
+      class="mt-8 inline-block bg-brand-accent text-brand-background font-bold py-3 px-8 rounded-lg text-lg hover:bg-lime-300 transition-transform transform hover:scale-105"
+    >
+      Ver Coleção
+    </a>
+  </section>
+
+  <section class="mt-16">
+    <h2 class="text-3xl font-bold text-center mb-8">Tesouros em Destaque</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <div
+        *ngFor="let product of products"
+        [routerLink]="['/product', product.id]"
+        class="bg-brand-surface rounded-lg transition-all overflow-hidden group hover:cursor-pointer hover:scale-105"
+      >
+        <img
+          [src]="product.image_url"
+          alt="{{ product.name }}"
+          class="w-full h-48 md:h-64 object-cover group-hover:opacity-80 transition-opacity"
+        />
+        <div class="p-4">
+          <h3 class="font-semibold text-brand-text truncate">
+            {{ product.name }}
+          </h3>
+          <p class="text-lg font-bold text-brand-accent mt-2">
+            R$ {{ product.price }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

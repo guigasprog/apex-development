@@ -1,0 +1,11 @@
+.image-gallery .main-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+}
+
+.image-gallery .thumbnails img:hover {
+  opacity: 0.8;
+  border-color: #a3e635;
+}
