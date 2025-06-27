@@ -1,5 +1,6 @@
 
 /node_modules/
+/server/node_modules/
 /server/auth-service/node_modules/
 /server/api-service/node_modules/
 /server/order-service/node_modules/

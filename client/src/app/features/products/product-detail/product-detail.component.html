@@ -127,44 +127,57 @@
   [draggable]="false"
   [resizable]="false"
 >
-  <div *ngIf="product" class="p-6 text-brand-text">
-    <div class="flex items-center gap-6 pb-6 mb-6 border-b border-gray-700">
+  <div *ngIf="product" class="p-6 sm:p-0 text-brand-text">
+    <div
+      class="flex flex-col sm:flex-row items-center gap-6 pb-6 mb-6 border-b border-gray-700"
+    >
       <img
         [src]="selectedImageUrl"
         [alt]="product.nome"
-        class="w-24 h-24 object-contain rounded-md bg-brand-surface p-2 flex-shrink-0"
+        class="w-28 h-28 object-contain rounded-md bg-brand-surface p-2 flex-shrink-0"
       />
-      <div>
-        <h3 class="text-xl font-bold text-white">{{ product.nome }}</h3>
-        <p class="text-2xl text-brand-accent font-semibold">
-          {{ product.preco | currency : "BRL" }}
-        </p>
+      <div class="flex items-start gap-4">
+        <div>
+          <h3 class="text-xl font-bold text-white">{{ product.nome }}</h3>
+          <p class="text-2xl text-brand-accent font-semibold">
+            {{ product.preco | currency : "BRL" }}
+          </p>
+        </div>
+        <div class="flex-shrink-0">
+          <label
+            class="block text-sm font-medium text-brand-text-secondary mb-2"
+            >Quantidade</label
+          >
+          <p-inputnumber
+            [(ngModel)]="quantity"
+            [min]="1"
+            [max]="100"
+            (onValueChange)="resetShipping()"
+            [showButtons]="true"
+            buttonLayout="vertical"
+            spinnerMode="vertical"
+            inputId="quantity"
+            [inputStyle]="{ width: '3rem' }"
+          >
+            <ng-template pTemplate="incrementbuttonicon">
+              <span class="pi pi-plus"></span>
+            </ng-template>
+            <ng-template pTemplate="decrementbuttonicon">
+              <span class="pi pi-minus"></span>
+            </ng-template>
+          </p-inputnumber>
+        </div>
       </div>
     </div>
 
     <div class="space-y-6">
-      <div>
-        <label class="block text-sm font-medium text-brand-text-secondary mb-2"
-          >Quantidade</label
-        >
-        <p-inputNumber
-          [(ngModel)]="quantity"
-          (onValueChange)="resetShipping()"
-          [showButtons]="true"
-          buttonLayout="horizontal"
-          inputId="quantity"
-          spinnerMode="horizontal"
-          [min]="1"
-          [max]="100"
-        ></p-inputNumber>
-      </div>
       <div>
         <label
           for="cep"
           class="block text-sm font-medium text-brand-text-secondary mb-2"
           >Calcular Frete (SEDEX)</label
         >
-        <div class="p-inputgroup">
+        <div class="p-inputgroup flex">
           <input
             id="cep"
             type="text"
@@ -176,7 +189,7 @@
             icon="pi pi-truck"
             (click)="calculateShipping()"
             [loading]="isCalculatingShipping"
-            styleClass="p-button-secondary"
+            size="large"
           ></p-button>
         </div>
       </div>
@@ -214,15 +227,13 @@
       pRipple
       label="Cancelar"
       (click)="displayAddToCartDialog = false"
-      class="p-button-text p-button-secondary"
+      class="p-button-text"
     ></button>
     <button
       pButton
       pRipple
-      label="Confirmar e Adicionar"
+      label="Confirmar"
       (click)="confirmAddToCart()"
-      [disabled]="!shippingInfo"
-      class="p-button-success"
     ></button>
   </ng-template>
 </p-dialog>

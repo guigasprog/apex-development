@@ -28,9 +28,11 @@ export class ApiService {
   orders = {
     create: (orderData: any) => api.post(environment.ordersApi, orderData),
   };
-  // NOVO: Endpoint para o serviço de frete
   shipping = {
     calculate: (shippingData: any) =>
       api.post(`${environment.shippingApi}/calculate`, shippingData),
+  };
+  viacep = {
+    get: (cep: string) => axios.get(`https://viacep.com.br/ws/${cep}/json/`),
   };
 }

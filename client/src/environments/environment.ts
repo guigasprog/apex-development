@@ -1,12 +1,12 @@
 export const environment = {
   production: false,
-  imageBaseUrl: 'http://localhost/vibe-vault/stocktrack/',
+  imageBaseUrl: 'http://172.20.0.131/vibe-vault/stocktrack/',
 
-  authApi: 'http://localhost:4001/api/auth',
+  authApi: 'http://172.20.0.131:4001/api/auth',
 
-  productsApi: 'http://localhost:4002/api/products',
+  productsApi: 'http://172.20.0.131:4002/api/products',
 
-  ordersApi: 'http://localhost:4003/api/orders',
+  ordersApi: 'http://172.20.0.131:4003/api/orders',
 
-  shippingApi: 'http://localhost:4004/api/shipping',
+  shippingApi: 'http://172.20.0.131:4004/api/shipping',
 };

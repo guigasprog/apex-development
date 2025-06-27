@@ -1,0 +1,103 @@
+<p-sidebar
+  [visible]="(cartService.sidebarVisible$ | async) ?? false"
+  (visibleChange)="onVisibleChange($event)"
+  position="right"
+  styleClass="w-full md:w-2/3 lg:w-1/3"
+>
+  <ng-template pTemplate="header">
+    <div class="flex items-center gap-3">
+      <i class="pi pi-shopping-cart text-2xl text-brand-accent"></i>
+      <h2 class="text-2xl font-bold text-white">Seu Carrinho</h2>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="content">
+    <div
+      *ngIf="cartItems$ | async as items; else emptyCart"
+      class="h-full flex flex-col p-1"
+    >
+      <div
+        *ngIf="items.length > 0; else emptyCart"
+        class="flex-grow overflow-y-auto pr-4 -mr-4"
+      >
+        <div
+          *ngFor="let item of items"
+          class="flex items-start gap-4 py-4 border-b border-gray-700"
+        >
+          <img
+            [src]="item.image_url"
+            [alt]="item.name"
+            class="w-20 h-20 object-cover rounded-md flex-shrink-0 bg-brand-surface"
+          />
+          <div class="flex-grow flex flex-col gap-2">
+            <div>
+              <h4 class="font-semibold text-brand-text leading-tight">
+                {{ item.name }}
+              </h4>
+              <p class="text-brand-accent text-sm">
+                {{ item.price | currency : "BRL" }}
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                pButton
+                icon="pi pi-minus"
+                (click)="updateQuantity($event, item.id, item.quantity - 1)"
+                class="p-button-sm p-button-secondary p-button-rounded"
+              ></button>
+              <span class="font-bold w-6 text-center">{{ item.quantity }}</span>
+              <button
+                pButton
+                icon="pi pi-plus"
+                (click)="updateQuantity($event, item.id, item.quantity + 1)"
+                class="p-button-sm p-button-secondary p-button-rounded"
+              ></button>
+            </div>
+          </div>
+          <button
+            pButton
+            icon="pi pi-trash"
+            (click)="removeItem($event, item.id)"
+            class="p-button-text p-button-danger"
+          ></button>
+        </div>
+      </div>
+
+      <div
+        *ngIf="items.length > 0"
+        class="mt-auto pt-6 border-t border-gray-700"
+      >
+        <div class="flex justify-between font-bold text-xl mb-4">
+          <span>Subtotal</span>
+          <span>{{ cartTotal$ | async | currency : "BRL" }}</span>
+        </div>
+        <button
+          pButton
+          (click)="checkout()"
+          label="Finalizar Compra"
+          icon="pi pi-lock"
+          class="w-full bg-brand-accent text-brand-background font-bold"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #emptyCart>
+    <div
+      class="text-center p-8 flex flex-col items-center justify-center h-full text-brand-text-secondary"
+    >
+      <i class="pi pi-cart-plus text-6xl mb-4"></i>
+      <h3 class="text-xl font-bold text-white mb-2">
+        Seu carrinho está vazio.
+      </h3>
+      <p>Adicione itens para vê-los aqui.</p>
+      <button
+        pButton
+        label="Começar a Comprar"
+        (click)="cartService.closeCart()"
+        routerLink="/"
+        class="p-button-text text-brand-accent mt-6"
+      ></button>
+    </div>
+  </ng-template>
+</p-sidebar>

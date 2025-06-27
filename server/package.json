@@ -1,0 +1,18 @@
+{
+  "name": "vibe-vault-server",
+  "version": "1.0.0",
+  "description": "Script para iniciar todos os microsserviços do backend simultaneamente.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm:start-api\" \"npm:start-auth\" \"npm:start-order\" \"npm:start-shipping\"",
+    "start-api": "cd api-service && npm start",
+    "start-auth": "cd auth-service && npm start",
+    "start-order": "cd order-service && npm start",
+    "start-shipping": "cd shipping-service && npm start"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

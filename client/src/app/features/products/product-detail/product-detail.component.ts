@@ -2,16 +2,20 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+// PrimeNG Modules
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { RadioButtonModule } from 'primeng/radiobutton';
+
 import { ApiService } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
-import { FormsModule } from '@angular/forms';
+import { CartItem, addItemToCart } from '../../../core/state/cart.store';
 
 @Component({
   selector: 'app-product-detail',
@@ -24,13 +28,13 @@ import { FormsModule } from '@angular/forms';
     ButtonModule,
     InputTextModule,
     InputNumberModule,
-    ProgressSpinnerModule,
     ToastModule,
     CurrencyPipe,
+    RadioButtonModule,
   ],
-  providers: [MessageService],
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.scss'],
+  providers: [MessageService],
 })
 export class ProductDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -47,35 +51,33 @@ export class ProductDetailComponent implements OnInit {
   descricaoContent: SafeHtml | undefined;
   sobreContent: SafeHtml | undefined;
 
+  // State for Add to Cart Dialog
   displayAddToCartDialog = false;
   quantity = 1;
   cep = '';
   isCalculatingShipping = false;
   shippingInfo: any = null;
   totalCost: number = 0;
+  shippingOptions: any[] = [];
+  selectedShipping: any = null;
 
   private imageBaseUrl = environment.imageBaseUrl;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
+      window.scrollTo(0, 0);
       const productId = params.get('id');
       if (productId) {
         this.loadProductDetails(productId);
-      } else {
-        this.isLoading = false;
-        this.error = 'Nenhum ID de produto foi fornecido.';
       }
     });
   }
 
   private stripInlineStyles(html: string): string {
-    if (!html) return '';
-    return html.replace(/ style="[^"]*"/g, '');
+    return html ? html.replace(/ style="[^"]*"/g, '') : '';
   }
 
   loadProductDetails(id: string): void {
-    window.scrollTo(0, 0);
-
     this.isLoading = true;
     this.error = null;
     this.product = null;
@@ -86,7 +88,7 @@ export class ProductDetailComponent implements OnInit {
       .then((response) => {
         const productData = response.data;
 
-        if (productData.imagens && productData.imagens.length > 0) {
+        if (productData.imagens?.length > 0) {
           productData.imagens = productData.imagens.map((img: any) => ({
             ...img,
             full_url: `${this.imageBaseUrl}/${img.image_url}`.replace(
@@ -114,7 +116,6 @@ export class ProductDetailComponent implements OnInit {
           );
         }
 
-        // Após carregar o produto principal, busca os relacionados
         if (this.product.categoria?.idCategoria) {
           this.loadRelatedProducts(
             this.product.categoria.idCategoria,
@@ -133,34 +134,28 @@ export class ProductDetailComponent implements OnInit {
   }
 
   loadRelatedProducts(categoryId: number, currentProductId: number): void {
-    this.apiService.products
-      .getAll()
-      .then((response) => {
-        this.relatedProducts = response.data
-          .filter(
-            (p: any) =>
-              p.categoria?.idCategoria === categoryId &&
-              p.id !== currentProductId
-          )
-          .slice(0, 3)
-          .map((p: any) => ({
-            id: p.id,
-            name: p.nome,
-            price: p.preco,
-            image_url:
-              p.imagens && p.imagens.length > 0
-                ? `${this.imageBaseUrl}/${p.imagens[0].image_url}`.replace(
-                    /\\/g,
-                    '/'
-                  )
-                : `https://placehold.co/400x400/1E1E1E/BEF264?text=${encodeURIComponent(
-                    p.nome
-                  )}`,
-          }));
-      })
-      .catch((err) => {
-        console.error('Erro ao buscar produtos relacionados:', err);
-      });
+    this.apiService.products.getAll().then((response) => {
+      this.relatedProducts = response.data
+        .filter(
+          (p: any) =>
+            p.categoria?.idCategoria === categoryId && p.id !== currentProductId
+        )
+        .slice(0, 5)
+        .map((p: any) => ({
+          id: p.id,
+          name: p.nome,
+          price: p.preco,
+          image_url:
+            p.imagens?.length > 0
+              ? `${this.imageBaseUrl}/${p.imagens[0].image_url}`.replace(
+                  /\\/g,
+                  '/'
+                )
+              : `https://placehold.co/400x400/1E1E1E/BEF264?text=${encodeURIComponent(
+                  p.nome
+                )}`,
+        }));
+    });
   }
 
   selectImage(imageUrl: string): void {
@@ -171,12 +166,16 @@ export class ProductDetailComponent implements OnInit {
     this.quantity = 1;
     this.cep = '';
     this.shippingInfo = null;
+    this.shippingOptions = [];
+    this.selectedShipping = null;
     this.totalCost = 0;
     this.displayAddToCartDialog = true;
   }
 
   resetShipping(): void {
     this.shippingInfo = null;
+    this.shippingOptions = [];
+    this.selectedShipping = null;
     this.totalCost = 0;
   }
 
@@ -236,13 +235,15 @@ export class ProductDetailComponent implements OnInit {
   }
 
   confirmAddToCart(): void {
-    console.log('Adicionando ao carrinho:', {
-      productId: this.product.id,
+    const itemToAdd: CartItem = {
+      id: this.product.id,
       name: this.product.nome,
+      price: parseFloat(this.product.preco),
+      image_url: this.selectedImageUrl,
       quantity: this.quantity,
-      unitPrice: this.product.preco,
-      shipping: this.shippingInfo,
-    });
+    };
+
+    addItemToCart(itemToAdd);
 
     this.displayAddToCartDialog = false;
     this.messageService.add({
