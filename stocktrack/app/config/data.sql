@@ -23,6 +23,8 @@ CREATE TABLE `clientes` (
   `telefone` VARCHAR(20) NULL,
   `cpf` VARCHAR(14) NOT NULL UNIQUE,
   `password` VARCHAR(255) NOT NULL,
+  `reset_token` VARCHAR(255) NULL DEFAULT NULL,
+  `reset_token_expires` DATETIME NULL DEFAULT NULL,
   `endereco_id` INT NULL,
   CONSTRAINT `fk_cliente_endereco`
     FOREIGN KEY (`endereco_id`)
@@ -41,12 +43,12 @@ CREATE TABLE `produtos` (
   `nome` VARCHAR(255) NOT NULL,
   `descricao` TEXT NULL,
   `sobre_o_item` TEXT NULL,
-  `validade` DATE NULL,
   `preco` DECIMAL(10, 2) NOT NULL,
-  `peso_kg` DECIMAL(10, 2) NOT NULL,
-  `comprimento_cm` INT NOT NULL,
-  `altura_cm` INT NOT NULL,
-  `largura_cm` INT NOT NULL,
+  `peso_kg` DECIMAL(10, 2) NOT NULL DEFAULT 0.3,
+  `comprimento_cm` INT NOT NULL DEFAULT 16,
+  `altura_cm` INT NOT NULL DEFAULT 2,
+  `largura_cm` INT NOT NULL DEFAULT 11,
+  `validade` DATE NULL,
   `categoria_id` INT NULL,
   CONSTRAINT `fk_produto_categoria`
     FOREIGN KEY (`categoria_id`)
@@ -101,4 +103,16 @@ CREATE TABLE `pedido_produto` (
     FOREIGN KEY (`produto_id`)
     REFERENCES `produtos` (`id`)
     ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE `produto_relevancia` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `produto_id` INT NULL, -- Pode ser nulo para buscas sem resultado
+  `tipo_relevancia` ENUM('view', 'search') NOT NULL DEFAULT 'view',
+  `texto_busca` VARCHAR(255) NULL DEFAULT NULL, -- Armazena o termo pesquisado
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_relevancia_produto`
+    FOREIGN KEY (`produto_id`)
+    REFERENCES `produtos` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;

@@ -71,8 +71,18 @@
         </menu>
     </menuitem>
 
-    <menuitem label="Mapeamento de Entidades">
-        <icon>fa:sitemap fa-fw</icon>
-        <action>EntityMapping</action>
+    <menuitem label="Relatórios">
+      <icon>fa:chart-pie fa-fw</icon>
+      <menu>
+          <menuitem label="Análise de Pesquisas">
+              <icon>fa:search fa-fw</icon>
+              <action>PesquisasRecentesList</action>
+          </menuitem>
+      </menu>
+  </menuitem>
+
+    <menuitem label="Logout">
+        <icon>fa:sign-out-alt fa-fw</icon>
+        <action>LoginForm::onLogout</action>
     </menuitem>
 </menu>
