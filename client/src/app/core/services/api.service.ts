@@ -20,10 +20,22 @@ export class ApiService {
       api.post(`${environment.authApi}/login`, credentials),
     register: (userData: any) =>
       api.post(`${environment.authApi}/register`, userData),
+    forgotPassword: (email: string) =>
+      api.post(`${environment.authApi}/forgot-password`, { email }),
+    verifyCode: (email: string, code: string) =>
+      api.post(`${environment.authApi}/verify-code`, { email, code }),
+    resetPassword: (resetData: any) =>
+      api.post(`${environment.authApi}/reset-password`, resetData),
   };
   products = {
     getAll: () => api.get(environment.productsApi),
     getById: (id: string) => api.get(`${environment.productsApi}/${id}`),
+    trackView: (id: string) =>
+      api.post(`${environment.productsApi}/${id}/track-view`),
+    getSearchSuggestions: (query: string, id?: number) =>
+      api.get(
+        `${environment.productsApi}/search/suggestions?q=${query}&id=${id}`
+      ),
   };
   orders = {
     create: (orderData: any) => api.post(environment.ordersApi, orderData),

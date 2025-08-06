@@ -51,8 +51,11 @@
           Entrar
         </button>
       </div>
+
       <div class="text-center text-sm">
-        <a href="#" class="text-brand-accent hover:underline"
+        <a
+          (click)="showForgotPasswordDialog()"
+          class="text-brand-accent hover:underline cursor-pointer"
           >Esqueceu sua senha?</a
         >
       </div>
@@ -67,3 +70,100 @@
     </form>
   </div>
 </div>
+
+<p-dialog
+  header="Recuperar Senha"
+  [(visible)]="displayForgotPasswordDialog"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '500px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <form [formGroup]="resetForm" class="p-4">
+    <div *ngIf="resetStep === 1">
+      <p class="mb-4 text-brand-text-secondary">
+        Digite seu e-mail para enviarmos um código de verificação.
+      </p>
+      <div class="flex flex-col gap-2">
+        <label for="reset-email" class="text-brand-text-secondary"
+          >E-mail</label
+        >
+        <input
+          id="reset-email"
+          type="email"
+          pInputText
+          formControlName="email"
+        />
+      </div>
+    </div>
+
+    <div *ngIf="resetStep === 2">
+      <p class="mb-4 text-brand-text-secondary">
+        Enviamos um código de 6 dígitos para
+        <strong class="text-white">{{ resetForm.get("email")?.value }}</strong
+        >. Verifique sua caixa de entrada.
+      </p>
+      <div class="flex flex-col gap-2">
+        <label for="code" class="text-brand-text-secondary"
+          >Código de Verificação</label
+        >
+        <input id="code" type="text" pInputText formControlName="code" />
+      </div>
+    </div>
+
+    <div *ngIf="resetStep === 3" class="space-y-4">
+      <p class="text-brand-text-secondary">
+        Código verificado! Agora, crie uma nova senha.
+      </p>
+      <div class="flex flex-col gap-2">
+        <label for="password" class="text-brand-text-secondary"
+          >Nova Senha</label
+        >
+        <input
+          id="password"
+          type="password"
+          pInputText
+          formControlName="password"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="confirmPassword" class="text-brand-text-secondary"
+          >Confirme a Nova Senha</label
+        >
+        <input
+          id="confirmPassword"
+          type="password"
+          pInputText
+          formControlName="confirmPassword"
+        />
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancelar"
+      (click)="displayForgotPasswordDialog = false"
+      styleClass="p-button-text"
+    ></p-button>
+
+    <p-button
+      *ngIf="resetStep === 1"
+      label="Enviar Código"
+      (click)="requestResetCode()"
+      [loading]="isLoading"
+    ></p-button>
+    <p-button
+      *ngIf="resetStep === 2"
+      label="Verificar Código"
+      (click)="submitVerificationCode()"
+      [loading]="isLoading"
+    ></p-button>
+    <p-button
+      *ngIf="resetStep === 3"
+      label="Redefinir Senha"
+      (click)="submitNewPassword()"
+      [loading]="isLoading"
+    ></p-button>
+  </ng-template>
+</p-dialog>

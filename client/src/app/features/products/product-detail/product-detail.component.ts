@@ -98,7 +98,7 @@ export class ProductDetailComponent implements OnInit {
           }));
           this.selectedImageUrl = productData.imagens[0].full_url;
         } else {
-          this.selectedImageUrl = `https://placehold.co/600x600/1E1E1E/BEF264?text=${encodeURIComponent(
+          this.selectedImageUrl = `https://placehold.co/800x800/1E1E1E/BEF264?text=${encodeURIComponent(
             productData.nome
           )}`;
         }
@@ -122,6 +122,8 @@ export class ProductDetailComponent implements OnInit {
             this.product.id
           );
         }
+
+        this.apiService.products.trackView(id).then(() => {});
 
         this.isLoading = false;
       })
