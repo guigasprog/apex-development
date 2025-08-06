@@ -1,37 +1,47 @@
-const sequelize = require('../config/database');
-const Categoria = require('./Categoria');
-const Cliente = require('./Cliente');
-const Endereco = require('./Endereco');
-const Estoque = require('./Estoque');
-const ImagemProduto = require('./ImagemProduto');
-const Pedido = require('./Pedido');
-const PedidoProduto = require('./PedidoProduto');
-const Produto = require('./Produto');
+const sequelize = require("../config/database");
+const Categoria = require("./Categoria");
+const Cliente = require("./Cliente");
+const Endereco = require("./Endereco");
+const Estoque = require("./Estoque");
+const ImagemProduto = require("./ImagemProduto");
+const ProdutoRelevancia = require("./ProdutoRelevancia");
+const Pedido = require("./Pedido");
+const PedidoProduto = require("./PedidoProduto");
+const Produto = require("./Produto");
 
-Cliente.belongsTo(Endereco, { foreignKey: 'endereco_id', as: 'endereco' });
-Endereco.hasOne(Cliente, { foreignKey: 'endereco_id' });
+Cliente.belongsTo(Endereco, { foreignKey: "endereco_id", as: "endereco" });
+Endereco.hasOne(Cliente, { foreignKey: "endereco_id" });
 
-Categoria.hasMany(Produto, { foreignKey: 'categoria_id' });
-Produto.belongsTo(Categoria, { foreignKey: 'categoria_id', as: 'categoria' });
+Categoria.hasMany(Produto, { foreignKey: "categoria_id" });
+Produto.belongsTo(Categoria, { foreignKey: "categoria_id", as: "categoria" });
 
-Produto.hasMany(Estoque, { foreignKey: 'produto_id', as: 'estoques' });
-Estoque.belongsTo(Produto, { foreignKey: 'produto_id' });
+Produto.hasMany(Estoque, { foreignKey: "produto_id", as: "estoques" });
+Estoque.belongsTo(Produto, { foreignKey: "produto_id" });
 
-Produto.hasMany(ImagemProduto, { foreignKey: 'produto_id', as: 'imagens' });
-ImagemProduto.belongsTo(Produto, { foreignKey: 'produto_id' });
+Produto.hasMany(ImagemProduto, { foreignKey: "produto_id", as: "imagens" });
+ImagemProduto.belongsTo(Produto, { foreignKey: "produto_id" });
 
-Cliente.hasMany(Pedido, { foreignKey: 'cliente_id' });
-Pedido.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+Produto.hasMany(ProdutoRelevancia, { foreignKey: "produto_id" });
+ProdutoRelevancia.belongsTo(Produto, { foreignKey: "produto_id" });
 
-Pedido.belongsToMany(Produto, { through: PedidoProduto, foreignKey: 'pedido_id', as: 'produtos' });
-Produto.belongsToMany(Pedido, { through: PedidoProduto, foreignKey: 'produto_id' });
+Cliente.hasMany(Pedido, { foreignKey: "cliente_id" });
+Pedido.belongsTo(Cliente, { foreignKey: "cliente_id", as: "cliente" });
 
+Pedido.belongsToMany(Produto, {
+  through: PedidoProduto,
+  foreignKey: "pedido_id",
+  as: "produtos",
+});
+Produto.belongsToMany(Pedido, {
+  through: PedidoProduto,
+  foreignKey: "produto_id",
+});
 
 const initDb = async () => {
   try {
-    console.log('Modelos sincronizados com o banco de dados.');
+    console.log("Modelos sincronizados com o banco de dados.");
   } catch (error) {
-    console.error('Erro ao sincronizar modelos:', error);
+    console.error("Erro ao sincronizar modelos:", error);
   }
 };
 
@@ -43,6 +53,7 @@ module.exports = {
   Endereco,
   Estoque,
   ImagemProduto,
+  ProdutoRelevancia,
   Pedido,
   PedidoProduto,
   Produto,
