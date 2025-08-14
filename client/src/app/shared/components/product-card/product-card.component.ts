@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   template: `
     <a
       [routerLink]="['/product', product.id]"
-      class="block bg-brand-surface rounded-lg overflow-hidden group w-full transition-transform duration-300 hover:-translate-y-1"
+      class="block bg-brand-surface rounded-lg overflow-hidden group w-64 transition-transform duration-300 hover:-translate-y-1"
     >
       <div class="relative w-full h-48 md:h-64 bg-gray-800">
         <img

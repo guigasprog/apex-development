@@ -42,3 +42,7 @@ a:hover {
     @apply text-2xl font-bold text-brand-accent mb-4;
   }
 }
+
+.meu-carrossel-customizado .p-carousel-item {
+  flex: none !important;
+}

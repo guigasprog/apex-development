@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../core/services/api.service';
 import { environment } from '../../../environments/environment';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { ProductCardSkeletonComponent } from '../../shared/components/product-card-skeleton/product-card-skeleton.component';
+import { CarouselModule } from 'primeng/carousel';
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ import { ProductCardSkeletonComponent } from '../../shared/components/product-ca
     RouterLink,
     ProductCardComponent,
     ProductCardSkeletonComponent,
+    CarouselModule,
   ],
   templateUrl: './home.component.html',
 })
@@ -25,10 +27,24 @@ export class HomeComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
 
+  responsiveOptions: any[] = [];
+
   private imageBaseUrl = environment.imageBaseUrl;
 
   ngOnInit(): void {
     this.loadRelevantProducts();
+    this.responsiveOptions = [
+      {
+        breakpoint: '992px',
+        numVisible: 1,
+        numScroll: 1,
+      },
+      {
+        breakpoint: '768px',
+        numVisible: 1,
+        numScroll: 1,
+      },
+    ];
   }
 
   loadRelevantProducts(): void {

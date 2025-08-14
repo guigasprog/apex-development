@@ -90,8 +90,6 @@ exports.trackProductView = async (req, res) => {
 
 exports.getSearchSuggestions = async (req, res) => {
   const { q } = req.query;
-  let id;
-  if (req.id) id = req.id;
   if (!q || q.length < 2) return res.json([]);
 
   try {
@@ -110,45 +108,32 @@ exports.getSearchSuggestions = async (req, res) => {
       order: [[sequelize.literal("view_count"), "DESC"]],
       limit: 10,
     });
-    console.log("----+++----");
-    let search = buscarProdutos(q, id, suggestions, res);
-    console.log(search);
-    console.log("-----------");
-    res.status(200).json({ suggestions: suggestions, id_search: search.id });
+    res.status(200).json(suggestions);
   } catch (error) {
     console.error("Erro ao buscar sugestões:", error);
     res.status(500).json({ error: "Erro ao buscar sugestões." });
   }
 };
 
-async function buscarProdutos(q, id, suggestions, res) {
-  let searchRecord;
+exports.trackSearch = async (req, res) => {
+  const { searchText, productId } = req.body;
 
-  for (const s of suggestions) {
-    if (id) {
-      searchRecord = await ProdutoRelevancia.findByPk(id);
-      console.log(searchRecord);
-      if (searchRecord) {
-        await searchRecord.update({
-          produto_id: s.id,
-          tipo_relevancia: "search",
-          texto_busca: q,
-        });
-      } else {
-        searchRecord = await ProdutoRelevancia.create({
-          produto_id: s.id,
-          tipo_relevancia: "search",
-          texto_busca: q,
-        });
-      }
-    } else {
-      searchRecord = await ProdutoRelevancia.create({
-        produto_id: s.id,
-        tipo_relevancia: "search",
-        texto_busca: q,
-      });
-    }
+  if (!searchText || searchText.trim() === "") {
+    return res.status(400).json({ error: "O texto da busca é obrigatório." });
   }
 
-  return res.json(searchRecord);
-}
+  try {
+    await ProdutoRelevancia.create({
+      produto_id: productId || null,
+      tipo_relevancia: "search",
+      texto_busca: searchText.trim(),
+    });
+
+    res.status(200).send({ message: "Busca rastreada com sucesso." });
+  } catch (error) {
+    console.error("Falha ao rastrear busca:", error.message);
+    res
+      .status(200)
+      .send({ message: "Falha silenciosa no rastreamento da busca." });
+  }
+};
