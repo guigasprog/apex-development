@@ -11,6 +11,7 @@ use Adianti\Widget\Form\TField;
 use Adianti\Widget\Form\THidden;
 use Adianti\Widget\Util\TImage;
 use Adianti\Util\AdiantiTemplateHandler;
+use Adianti\Util\AdiantiStringConversion;
 
 use Math\Parser;
 use Exception;
@@ -18,7 +19,7 @@ use Exception;
 /**
  * DataGrid Widget: Allows to create datagrids with rows, columns and actions
  *
- * @version    7.6
+ * @version    8.2
  * @package    widget
  * @subpackage datagrid
  * @author     Pablo Dall'Oglio
@@ -44,11 +45,6 @@ class TDataGrid extends TTable
     protected $groupTotal;
     protected $groupContent;
     protected $groupMask;
-    protected $popover;
-    protected $poptitle;
-    protected $popside;
-    protected $popcontent;
-    protected $popcondition;
     protected $objects;
     protected $objectsGroup;
     protected $actionWidth;
@@ -66,6 +62,12 @@ class TDataGrid extends TTable
     protected $actionSide;
     protected $mutationAction;
     protected $forPrinting;
+    protected $popovers;
+    protected $pageSize;
+    protected $pageOrientation;
+    protected $searchForm;
+    protected $editForm;
+    protected $metadata;
     
     /**
      * Class Constructor
@@ -75,7 +77,6 @@ class TDataGrid extends TTable
         parent::__construct();
         $this->modelCreated = FALSE;
         $this->defaultClick = TRUE;
-        $this->popover = FALSE;
         $this->groupColumn = NULL;
         $this->groupContent = NULL;
         $this->groupMask = NULL;
@@ -96,7 +97,7 @@ class TDataGrid extends TTable
         $this->hasTotalFunction = false;
         $this->actionSide = 'left';
         $this->forPrinting = false;
-        
+        $this->popovers = [];
         $this->rowcount = 0;
         $this->{'class'} = 'tdatagrid_table';
         $this->{'id'}    = 'tdatagrid_' . mt_rand(1000000000, 1999999999);
@@ -157,11 +158,12 @@ class TDataGrid extends TTable
      */
     public function enablePopover($title, $content, $popside = null, $popcondition = null)
     {
-        $this->popover = TRUE;
-        $this->poptitle = $title;
-        $this->popcontent = $content;
-        $this->popside = $popside;
-        $this->popcondition = $popcondition;
+        $this->popovers[] = [
+            'title' => $title,
+            'content' => $content,
+            'side' => $popside,
+            'condition' => $popcondition
+        ];
     }
     
     /**
@@ -242,7 +244,7 @@ class TDataGrid extends TTable
      * Add a Column to the DataGrid
      * @param $object A TDataGridColumn object
      */
-    public function addColumn(TDataGridColumn $object, TAction $action = null)
+    public function addColumn(TDataGridColumn $object, ?TAction $action = null)
     {
         if ($this->modelCreated)
         {
@@ -329,13 +331,52 @@ class TDataGrid extends TTable
         
         if ($this->columns)
         {
-            foreach ($this->columns as $column)
+            foreach ($this->columns as $key => $column)
             {
                 $column->removeAction();
+                
+                if (!$column->isPrintable())
+                {
+                    unset($this->columns[$key]);
+                }
             }
         }
         
         $this->createModel();
+    }
+    
+    /**
+     * Set page Size
+     * @param $page_size (a3,a4,a5,letter,legal)
+     */
+    public function setPageSize($page_size)
+    {
+        $this->pageSize = $page_size;
+    }
+    
+    /**
+     * Return the page size
+     */
+    public function getPageSize()
+    {
+        return $this->pageSize;
+    }
+    
+    /**
+     * Set page orientation
+     * @param $page_orientation (portrait, landscape)
+     */
+    public function setPageOrientation($page_orientation)
+    {
+        $this->pageOrientation = $page_orientation;
+    }
+    
+    /**
+     * Return the page orientation
+     */
+    public function getPageOrientation()
+    {
+        return $this->pageOrientation;
     }
     
     /**
@@ -592,6 +633,8 @@ class TDataGrid extends TTable
         parent::add($this->tbody);
         
         $this->modelCreated = TRUE;
+        
+        return $this->modelCreated;
     }
     
     /**
@@ -632,13 +675,24 @@ class TDataGrid extends TTable
      * Add objects to the DataGrid
      * @param $objects An array of Objects
      */
-    public function addItems($objects)
+    public function addItems($objects, $with_data_key = false)
     {
         if ($objects)
         {
             foreach ($objects as $object)
             {
-                $this->addItem($object);
+                $row = $this->addItem($object);
+                
+                if ($with_data_key)
+                {
+                    $columns = $this->getColumns();
+                    $first_column = reset($columns);
+                    $attribute_name = $first_column->getName();
+                    if (isset($object->$attribute_name))
+                    {
+                        $row->{'data-key'} = $object->$attribute_name;
+                    }
+                }
             }
         }
     }
@@ -650,7 +704,7 @@ class TDataGrid extends TTable
      */
     private function createItemActions($row, $object)
     {
-        $first_url = null;
+        $first_action = null;
         
         if ($this->actions)
         {
@@ -662,23 +716,33 @@ class TDataGrid extends TTable
                 
                 // get the action properties
                 $label     = $action->getLabel();
+                $title     = $action->getTitle();
                 $image     = $action->getImage();
                 $condition = $action->getDisplayCondition();
                 
                 if (empty($condition) OR call_user_func($condition, $object))
                 {
-                    $url       = $action->serialize(TRUE, TRUE);
-                    $first_url = isset($first_url) ? $first_url : $url;
+                    $url          = $action->serialize(TRUE, TRUE);
+                    $first_action = isset($first_action) ? $first_action : $action;
                     
                     // creates a link
                     $link = new TElement('a');
                     $link->{'href'}      = htmlspecialchars($url);
                     $link->{'generator'} = 'adianti';
-                    $link->{'title'} = $label;
+                    $link->{'title'} = $title ?? $label;
                     
                     if ($url == '#disabled')
                     {
                         $link->{'disabled'} = '1';
+                    }
+                    else if ($action->isPopover())
+                    {
+                        unset($link->{'href'});
+                        unset($link->{'generator'});
+                        
+                        $link->{'popaction'} = $action->serialize(false);
+                        $link->{'poptrigger'} = 'click';
+                        $link->{'data-popover'} = 'true';
                     }
                     
                     // verify if the link will have an icon or a label
@@ -762,7 +826,7 @@ class TDataGrid extends TTable
                         if (empty($condition) OR call_user_func($condition, $object))
                         {
                             $url       = $action->serialize(TRUE, TRUE);
-                            $first_url = isset($first_url) ? $first_url : $url;
+                            $first_action = isset($first_action) ? $first_action : $action;
                             
                             if ($url !== '#disabled')
                             {
@@ -780,7 +844,7 @@ class TDataGrid extends TTable
             }
         }
         
-        return $first_url;
+        return $first_action;
     }
     
     /**
@@ -861,7 +925,7 @@ class TDataGrid extends TTable
             
             if ($this->actionSide == 'left')
             {
-                $first_url = $this->createItemActions( $row, $object );
+                $first_action = $this->createItemActions( $row, $object );
             }
             
             $output_row = [];
@@ -879,39 +943,8 @@ class TDataGrid extends TTable
                     $function = $column->getTransformer();
                     $props    = $column->getDataProperties();
                     
-                    // calculated column
-                    if (substr($name,0,1) == '=')
-                    {
-                        $content = AdiantiTemplateHandler::replace($name, $object, 'float');
-                        $content = AdiantiTemplateHandler::evaluateExpression(substr($content,1));
-                        $object->$name = $content;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            @$content  = $object->$name; // fire magic methods
-                            
-                            if (is_null($content))
-                            {
-                                $content = AdiantiTemplateHandler::replace($name, $object);
-                                
-                                if ($content === $name)
-                                {
-                                    $content = '';
-                                }
-                            }
-                        }
-                        catch (Exception $e)
-                        {
-                            $content = AdiantiTemplateHandler::replace($name, $object);
-                            
-                            if (empty(trim($content)) OR $content === $name)
-                            {
-                                $content = $e->getMessage();
-                            }
-                        }
-                    }
+                    $content = self::getColumnContent($object, $name);
+                    $name = self::normalizeColumnName($name);
                     
                     if (isset($this->columnValues[$name]))
                     {
@@ -921,7 +954,7 @@ class TDataGrid extends TTable
                     {
                         $this->columnValues[$name] = [$content];
                     }
-
+                    
                     if (isset($this->columnValuesGroup[$this->groupContent][$name]))
                     {
                         $this->columnValuesGroup[$this->groupContent][$name][] = $content;
@@ -967,7 +1000,7 @@ class TDataGrid extends TTable
                         
                         $row->add($cell);
                         $cell->add($div);
-                        $cell->{'class'} = 'tdatagrid_cell';
+                        $cell->{'class'} .= ' tdatagrid_cell';
                     }
                     else
                     {
@@ -977,21 +1010,33 @@ class TDataGrid extends TTable
                         
                         if ($this->hiddenFields AND !isset($used_hidden[$name]))
                         {
-                            $hidden = new THidden($this->id . '_' . $name.'[]');
+                            $hidden = new THidden($this->id . '_' . AdiantiStringConversion::slug($name, '_').'[]');
                             $hidden->{'data-hidden-field'} = 'true';
                             $hidden->setValue($raw_data);
                             $cell->add($hidden);
                             $used_hidden[$name] = true;
                         }
                         
-                        $cell->{'class'} = 'tdatagrid_cell';
+                        $cell->{'class'} .= ' tdatagrid_cell';
                         $cell->{'align'} = $align;
                         
-                        if (isset($first_url) && $this->defaultClick && empty($cell->{'href'}) && !empty($first_url) && ($first_url !== '#disabled'))
+                        if (isset($first_action) && $this->defaultClick && empty($cell->{'href'}) && !empty($first_action) && ($first_action->serialize(TRUE, TRUE) !== '#disabled'))
                         {
-                            $cell->{'href'}      = $first_url;
-                            $cell->{'generator'} = 'adianti';
-                            $cell->{'class'}     = 'tdatagrid_cell';
+                            if ($first_action->isPopover())
+                            {
+                                unset($link->{'href'});
+                                unset($link->{'generator'});
+                                
+                                $cell->{'popaction'} = $first_action->serialize(false);
+                                $cell->{'poptrigger'} = 'click';
+                                $cell->{'data-popover'} = 'true';
+                            }
+                            else
+                            {
+                                $cell->{'href'}      = $first_action->serialize(TRUE, TRUE);
+                                $cell->{'generator'} = 'adianti';
+                                $cell->{'class'}    .= ' tdatagrid_cell';
+                            }
                         }
                     }
                     
@@ -1014,21 +1059,9 @@ class TDataGrid extends TTable
                 $this->createItemActions( $row, $object );
             }
             
-            if ($this->popover && (empty($this->popcondition) OR call_user_func($this->popcondition, $object)))
+            if ($this->popovers)
             {
-                $poptitle   = $this->poptitle;
-                $popcontent = $this->popcontent;
-                $poptitle   = AdiantiTemplateHandler::replace($poptitle, $object);
-                $popcontent = AdiantiTemplateHandler::replace($popcontent, $object, null, true);
-                
-                $row->{'data-popover'} = 'true';
-                $row->{'poptitle'} = $poptitle;
-                $row->{'popcontent'} = htmlspecialchars(str_replace("\n", '', nl2br($popcontent)));
-                
-                if ($this->popside)
-                {
-                    $row->{'popside'} = $this->popside;
-                }
+                $this->processPopovers($row, $object);
             }
             
             if (count($this->searchAttributes) > 0)
@@ -1056,6 +1089,88 @@ class TDataGrid extends TTable
         else
         {
             throw new Exception(AdiantiCoreTranslator::translate('You must call ^1 before ^2', 'createModel', __METHOD__ ) );
+        }
+    }
+    
+    /**
+     * Process the column content
+     * @param $object Object
+     * @param $name Attribute name
+     */
+    public static function getColumnContent($object, $name)
+    {
+        // calculated column
+        if (substr($name,0,1) == '=' || (preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*=[.]*/', $name, $matches)))
+        {
+            $content = AdiantiTemplateHandler::replace($name, $object, 'float');
+            $name    = self::normalizeColumnName($name);
+            
+            $pieces = explode('=', $content);
+            if ( (count($pieces) == 2) && !empty($pieces[0]) )
+            {
+                $formula = $pieces[1];
+            }
+            else
+            {
+                $formula = substr($content,1);
+            }
+            
+            $content = AdiantiTemplateHandler::evaluateExpression($formula);
+            $object->$name = $content;
+        }
+        else
+        {
+            try
+            {
+                @$content  = $object->$name; // fire magic methods
+                
+                if (is_null($content))
+                {
+                    $content = AdiantiTemplateHandler::replace($name, $object);
+                    
+                    if ($content === $name)
+                    {
+                        $content = '';
+                    }
+                }
+            }
+            catch (Exception $e)
+            {
+                $content = AdiantiTemplateHandler::replace($name, $object);
+                
+                if ( (empty(trim($content)) || $content === $name) && strpos($name, '?') === false)
+                {
+                    $content = $e->getMessage();
+                }
+            }
+        }
+        
+        return $content;
+    }
+    
+    /**
+     * Run popover according to their conditions
+     */
+    private function processPopovers($row, $object)
+    {
+        foreach ($this->popovers as $popover)
+        {
+            if (empty($popover['condition']) || call_user_func($popover['condition'], $object))
+            {
+                $poptitle   = $popover['title'];
+                $popcontent = $popover['content'];
+                $poptitle   = AdiantiTemplateHandler::replace($poptitle, $object);
+                $popcontent = AdiantiTemplateHandler::replace($popcontent, $object, null, true);
+                
+                $row->{'data-popover'} = 'true';
+                $row->{'poptitle'} = $popover['side'];
+                $row->{'popcontent'} = htmlspecialchars(str_replace("\n", '', nl2br($popcontent)));
+                
+                if ($popover['side'])
+                {
+                    $row->{'popside'} = $popover['side'];
+                }
+            }
         }
     }
     
@@ -1091,6 +1206,20 @@ class TDataGrid extends TTable
     public function getItems()
     {
         return $this->objects;
+    }
+    
+    /**
+     * rebuild
+     */
+    public function rebuild()
+    {
+        $items = $this->getItems();
+        $this->clear();
+        
+        if ($items)
+        {
+            $this->addItems($items, true);
+        }
     }
     
     private function processGroupTotals($valueGroup)
@@ -1141,6 +1270,8 @@ class TDataGrid extends TTable
                 $align         = $column->getAlign();
                 $width         = $column->getWidth();
                 $props         = $column->getDataProperties();
+                $name          = self::normalizeColumnName($name);
+                
                 $cell->{'style'} = "text-align:$align";
                 
                 if ($width)
@@ -1259,6 +1390,8 @@ class TDataGrid extends TTable
                 $align         = $column->getAlign();
                 $width         = $column->getWidth();
                 $props         = $column->getDataProperties();
+                $name          = self::normalizeColumnName($name);
+                
                 $cell->{'style'} = "text-align:$align";
                 
                 if ($width)
@@ -1386,6 +1519,58 @@ class TDataGrid extends TTable
     }
     
     /**
+     * Assign a TForm object
+     * @param $searchForm object
+     */
+    public function setSearchForm($searchForm)
+    {
+        $this->searchForm = $searchForm;
+    }
+    
+    /**
+     * Assign a TForm object
+     * @param $editForm object
+     */
+    public function setEditForm($editForm)
+    {
+        $this->editForm = $editForm;
+    }
+    
+    /**
+     * Return the assigned Search form object
+     * @return TForm object
+     */
+    public function getSearchForm()
+    {
+        return $this->searchForm;
+    }
+    
+    /**
+     * Return the assigned Edit form object
+     * @return TForm object
+     */
+    public function getEditForm()
+    {
+        return $this->editForm;
+    }
+    
+    /**
+     * Set metadata
+     */
+    public function setMetadata($metadata, $value)
+    {
+        $this->metadata[$metadata] = $value;
+    }
+    
+    /**
+     * Get metadata
+     */
+    public function getMetadata($metadata)
+    {
+        return $this->metadata[$metadata] ?? null;
+    }
+    
+    /**
      * Set serach attributes
      */
     public function setSearchAttributes($attributes)
@@ -1422,6 +1607,25 @@ class TDataGrid extends TTable
             $dom_att_string = implode(',', $dom_search_atts);
             TScript::create("__adianti_input_fuse_search('#{$input_id}', '{$dom_att_string}', '#{$datagrid_id} tr')");
         }
+    }
+    
+    /**
+     * Normalize column name when using formulas 
+     */
+    private static function normalizeColumnName($name)
+    {
+        $pieces = explode('=', $name);
+        
+        if ( (count($pieces) == 2) && !empty($pieces[0]) )
+        {
+            $name = $pieces[0];
+        }
+        else
+        {
+            $name = AdiantiStringConversion::slug($name, '_');
+        }
+        
+        return $name;
     }
     
     /**

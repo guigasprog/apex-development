@@ -44,7 +44,7 @@ class ProdutoForm extends TPage
         $largura_cm = new TNumeric('largura_cm', 0, '', '');
         $comprimento_cm = new TNumeric('comprimento_cm', 0, '', '');
 
-        $categorias = new TDBCombo('categoria_id', 'development', 'Categoria', 'idCategoria', 'nome', 'nome');
+        $categorias = new TDBCombo('categoria_id', 'main_db', 'Categoria', 'idCategoria', 'nome', 'nome');
 
         $id->setEditable(false);
         $preco->setNumericMask(2, ',', '.', true);
@@ -83,7 +83,7 @@ class ProdutoForm extends TPage
     {
         try
         {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
             $data = $this->form->getData();
             
             $produto = new Produto();
@@ -118,7 +118,7 @@ class ProdutoForm extends TPage
             if (isset($param['id']))
             {
                 $id = $param['id'];
-                TTransaction::open('development');
+                TTransaction::open('main_db');
 
                 $produto = new Produto($id);
 

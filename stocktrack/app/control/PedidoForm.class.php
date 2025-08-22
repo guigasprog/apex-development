@@ -38,8 +38,8 @@ class PedidoForm extends TPage
     private function initializeFormFields()
     {
         $id         = new TEntry('id');
-        $cliente_id = new TDBCombo('cliente_id', 'development', 'Cliente', 'id', 'nome', 'nome');
-        $this->produto_id = new TDBCombo('produto_id', 'development', 'Produto', 'id', 'nome', 'nome');
+        $cliente_id = new TDBCombo('cliente_id', 'main_db', 'Cliente', 'id', 'nome', 'nome');
+        $this->produto_id = new TDBCombo('produto_id', 'main_db', 'Produto', 'id', 'nome', 'nome');
         $quantidade = new TEntry('quantidade');
 
         $id->setEditable(FALSE);
@@ -65,7 +65,7 @@ class PedidoForm extends TPage
     public function loadAvailableProducts()
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
             $produtos_disponiveis = $this->getAvailableProducts();
             TTransaction::close();
 
@@ -99,7 +99,7 @@ class PedidoForm extends TPage
     public function onSave()
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             $data = $this->form->getData();
             $this->validateFormData($data);

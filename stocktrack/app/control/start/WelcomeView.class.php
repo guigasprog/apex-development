@@ -1,105 +1,112 @@
 <?php
 
-use Adianti\Control\TPage;
-use Adianti\Widget\Form\TButton;
-use Adianti\Widget\Form\TLabel;
-use Adianti\Widget\Container\TPanelGroup;
 use Adianti\Control\TAction;
-use Adianti\Widget\Container\TVBox;
+use Adianti\Control\TPage;
+use Adianti\Core\AdiantiCoreApplication;
+use Adianti\Widget\Base\TElement;
+use Adianti\Widget\Container\TPanelGroup;
+use Adianti\Widget\Form\TButton;
 use Adianti\Wrapper\BootstrapFormBuilder;
 
 class WelcomeView extends TPage
 {
-    public function __construct()
+    protected $form;
+
+    public function __construct($param)
     {
-        parent::__construct();
+        parent::__construct($param);
 
-        // Criação do formulário para encapsular os botões
-        $form = new BootstrapFormBuilder('form_welcome');
-        $form->setFormTitle('Menu Principal');
+        // 1. O formulário é necessário para encapsular os botões e suas ações
+        $this->form = new BootstrapFormBuilder('form_welcome');
+        $this->form->setFormTitle('Bem-vindo ao StockTrack!');
+        
+        // 2. Mensagem Explicativa
+        $intro_text = new TElement('div');
+        $intro_text->style = 'padding: 0 15px 15px 15px; text-align: center;';
+        $intro_text->add('<p>Este é o seu painel de controle para gestão de e-commerce.</p>
+                         <p>Utilize os cards abaixo para navegar pelas principais funcionalidades.</p><hr>');
+        
+        $this->form->addContent([$intro_text]);
 
-        // Container para centralizar os cards
-        $vbox = new TVBox();
-        $vbox->style = 'width: 100%; max-width: 800px; 
-        margin: auto; padding: 20px; display: flex; 
-        flex-warp: warp; gap: 30px; justify-content: center;
-        align-items: center;';
+        // 3. Container Responsivo para os Cards
+        $cards_container = new TElement('div');
+        $cards_container->class = 'row';
+        $cards_container->style = 'padding: 0 15px 15px 15px; justify-content: center;';
 
-        // Títulos e descrições das funcionalidades
+        // Lista de funcionalidades
         $items = [
-            ['Produto', 'Exibe todos os produtos cadastrados', 'ProdutosPage'],
-            ['Cliente', 'Exibe todos os clientes cadastrados', 'ClientesPage'],
-            ['Estoque', 'Exibe todas atualizações do estoque cadastrados', 'EstoquePage'],
-            ['Pedidos', 'Exibe todos os pedidos cadastrados', 'PedidosPage']
+            ['Produto', 'Cadastre, edite e visualize todos os produtos da sua loja.', 'ProdutosPage'],
+            ['Cliente', 'Gerencie sua base de clientes, consulte informações e históricos.', 'ClientesPage'],
+            ['Estoque', 'Controle as entradas e saídas de produtos do seu estoque.', 'EstoquePage'],
+            ['Pedidos', 'Acompanhe todos os pedidos realizados, desde a compra até a entrega.', 'PedidosPage']
         ];
 
-        // Array para armazenar os botões a serem registrados no formulário
-        $buttons = [];
-
-        // Criação dos cards para cada item
+        // Criação dos cards
         foreach ($items as $item) {
-            $card = $this->createCard($item[0], $item[1], $item[2], $buttons);
-            $vbox->add($card);
+            $card_wrapper = new TElement('div');
+            $card_wrapper->class = 'col-sm-12 col-md-6';
+            $card_wrapper->style = 'margin-bottom: 15px;';
+            
+            // Passamos o formulário para o método createCard
+            $card = $this->createCard($item[0], $item[1], $item[2]);
+            $card_wrapper->add($card);
+            $cards_container->add($card_wrapper);
         }
-
-        // Adiciona o container de cards ao formulário
-        $form->addContent([$vbox]);
-
-        // Define os botões como campos do formulário
-        $form->setFields($buttons);
-
-        // Adiciona o formulário à página
-        parent::add($form);
+        
+        $this->form->addContent([$cards_container]);
+        
+        // Adiciona o formulário completo à página
+        parent::add($this->form);
     }
 
     /**
-     * Cria um card para exibir informações e um botão de ação
+     * Cria um card de funcionalidade com título, descrição e um botão de ação.
      */
-    private function createCard($title, $description, $pageName, &$buttons)
+    private function createCard($title, $description, $pageName)
     {
-        // Criação do card com título
         $card = new TPanelGroup($title);
-        $card->style = 'margin-bottom: 20px; height: 240px';
+        $card->style = 'height: 100%; display: flex; flex-direction: column; justify-content: space-between;';
 
-        // Descrição da funcionalidade
-        $label = new TLabel($description);
-        $label->style = 'display: block; margin-top: 10px;';
+        $card_body = new TElement('div');
+        $card_body->style = 'padding: 15px; flex-grow: 1;';
+        $card_body->add($description);
+        $card->add($card_body);
+        
+        $button = new TButton($pageName); // Nome do botão
+        $button->setLabel('Acessar ' . $title);
+        $button->setImage('fa:arrow-right green');
+        $button->class = 'btn btn-outline-primary';
+        $button->style = 'width: 100%';
+        
+        $button->setAction(new TAction([$this, 'onView'.$pageName]), 'Acessar ' . $title);
 
-        // Criação do botão com uma ação associada
-        $button = new TButton($pageName);
-        $button->setLabel('Ir para ' . $title);
-        $button->setAction(new TAction([$this, 'onView'.$pageName]), 'Ir para ' . $title);
-        $button->setImage('fa:eye green');
-
-        // Adiciona o botão à lista de botões para ser registrado no formulário
-        $buttons[] = $button;
-
-        // Adiciona a descrição e o botão ao card
-        $card->add($label);
+        $this->form->addField($button);
+        
         $card->addFooter($button);
 
         return $card;
     }
 
     /**
-     * Ações de navegação para cada funcionalidade
+     * Ações de navegação para cada funcionalidade.
+     * Esta abordagem é robusta e funciona em todas as versões.
      */
-    public function onViewProdutosPage()
+    public function onViewProdutosPage($param)
     {
         AdiantiCoreApplication::gotoPage('ProdutosPage');
     }
 
-    public function onViewClientesPage()
+    public function onViewClientesPage($param)
     {
         AdiantiCoreApplication::gotoPage('ClientesPage');
     }
 
-    public function onViewEstoquePage()
+    public function onViewEstoquePage($param)
     {
         AdiantiCoreApplication::gotoPage('EstoquePage');
     }
 
-    public function onViewPedidosPage()
+    public function onViewPedidosPage($param)
     {
         AdiantiCoreApplication::gotoPage('PedidosPage');
     }

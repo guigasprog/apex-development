@@ -6,6 +6,7 @@ use Adianti\Database\TConnection;
 use Adianti\Log\TLogger;
 use Adianti\Log\TLoggerSTD;
 use Adianti\Log\TLoggerTXT;
+use Adianti\Log\TLoggerTPL;
 use Adianti\Log\AdiantiLoggerInterface;
 
 use PDO;
@@ -15,7 +16,7 @@ use Exception;
 /**
  * Manage Database transactions
  *
- * @version    7.6
+ * @version    8.2
  * @package    database
  * @author     Pablo Dall'Oglio
  * @copyright  Copyright (c) 2006 Adianti Solutions Ltd. (http://www.adianti.com.br)
@@ -102,9 +103,11 @@ class TTransaction
     public static function openFake($database)
     {
         $info = TConnection::getDatabaseInfo($database);
-        $info['fake'] = 1;
-        
-        TTransaction::open(null, $info);
+        if (is_array($info))
+        {
+            $info['fake'] = 1;
+        }
+        TTransaction::open($database, $info);
     }
     
     /**
@@ -209,7 +212,7 @@ class TTransaction
      * Assign a Logger strategy
      * @param $logger A TLogger child object
      */
-    public static function setLogger(AdiantiLoggerInterface $logger = null)
+    public static function setLogger(?AdiantiLoggerInterface $logger = null)
     {
         if (isset(self::$conn[self::$counter]))
         {
@@ -297,5 +300,13 @@ class TTransaction
         {
             self::setLogger( new TLoggerSTD );
         }
+    }
+    
+    /**
+     * Enable transaction log
+     */
+    public static function adump()
+    {
+        self::setLogger( new TLoggerTPL );
     }
 }

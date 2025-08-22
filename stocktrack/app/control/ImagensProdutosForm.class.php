@@ -33,7 +33,7 @@ class ImagensProdutosForm extends TPage
 
     private function createFormFields()
     {
-        $produto_id = new TDBCombo('produto_id', 'development', 'Produto', 'id', 'nome', 'nome');
+        $produto_id = new TDBCombo('produto_id', 'main_db', 'Produto', 'id', 'nome', 'nome');
         
         $image_urls = new TMultiFile('image_urls');
         $image_urls->setAllowedExtensions(['png', 'jpg', 'jpeg', 'gif']);
@@ -55,7 +55,7 @@ class ImagensProdutosForm extends TPage
     public function onSave()
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             $data = $this->form->getData();
             $this->form->validate();

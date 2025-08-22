@@ -50,7 +50,7 @@ class CategoriaForm extends TPage
     public function onSave()
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             $data = $this->form->getData();
             $this->validateData($data);
@@ -85,7 +85,7 @@ class CategoriaForm extends TPage
     {
         try {
             if (!empty($param['id'])) {
-                TTransaction::open('development');
+                TTransaction::open('main_db');
                 $categoria = new Categoria($param['id']);
                 $this->form->setData($categoria);
                 TTransaction::close();

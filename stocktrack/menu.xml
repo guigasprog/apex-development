@@ -3,86 +3,89 @@
         <icon>fas:home fa-fw</icon>
         <action>WelcomeView</action>
     </menuitem>
-    <menuitem label='Cadastro'>
-        <icon>fa:file-alt fa-fw</icon>
-        <menu>
 
-            <menuitem label='Estoque'>
-                <icon>fas:boxes fa-fw</icon>
-                <action>EstoqueForm</action>
-            </menuitem>
-            
-            <menuitem label='Cliente'>
-                <icon>fa:user fa-fw</icon>
-                <action>ClienteForm</action>
-            </menuitem>
+    <if condition="TSession::getValue('is_super_admin') == true">
+        <menuitem label="Administração">
+            <icon>fa:cogs</icon>
+            <menu>
+                <menuitem label="Gerenciar Tenants">
+                    <icon>fa:building</icon>
+                    <action>TenantList</action>
+                </menuitem>
+            </menu>
+        </menuitem>
+    </if>
 
-            <menuitem label='Categoria'>
-                <icon>fas:tag fa-fw</icon>
-                <action>CategoriaForm</action>
-            </menuitem>
+    <if condition="TSession::getValue('is_super_admin') !== true">
+        <menuitem label='Cadastro'>
+            <icon>fa:file-alt fa-fw</icon>
+            <menu>
+                <menuitem label='Estoque'>
+                    <icon>fas:boxes fa-fw</icon>
+                    <action>EstoqueForm</action>
+                </menuitem>
+                <menuitem label='Cliente'>
+                    <icon>fa:user fa-fw</icon>
+                    <action>ClienteForm</action>
+                </menuitem>
+                <menuitem label='Categoria'>
+                    <icon>fas:tag fa-fw</icon>
+                    <action>CategoriaForm</action>
+                </menuitem>
+                <menuitem label='Produto'>
+                    <icon>fas:cube fa-fw</icon>
+                    <action>ProdutoForm</action>
+                </menuitem>
+                <menuitem label='Imagem do Produto'>
+                    <icon>fa:image fa-fw</icon>
+                    <action>ImagensProdutosForm</action>
+                </menuitem>
+                <menuitem label='Pedidos'>
+                    <icon>fas:truck fa-fw</icon>
+                    <action>PedidoForm</action>
+                </menuitem>
+            </menu>
+        </menuitem>
 
-            <menuitem label='Produto'>
-                <icon>fas:cube fa-fw</icon>
-                <action>ProdutoForm</action>
-            </menuitem>
-            
-            <menuitem label='Imagem do Produto'>
-                <icon>fa:image fa-fw</icon>
-                <action>ImagensProdutosForm</action>
-            </menuitem>
-            
-            <menuitem label='Pedidos'>
-                <icon>fas:truck fa-fw</icon>
-                <action>PedidoForm</action>
-            </menuitem>
-            
-        </menu>
-    </menuitem>
+        <menuitem label='Visualize'>
+            <icon>fa:list-alt fa-fw</icon>
+            <menu>
+                <menuitem label='Cliente'>
+                    <icon>fa:users fa-fw</icon>
+                    <action>ClientesPage</action>
+                </menuitem>
+                <menuitem label='Produto'>
+                    <icon>fas:cube fa-fw</icon>
+                    <action>ProdutosPage</action>
+                </menuitem>
+                <menuitem label='Categoria'>
+                    <icon>fas:tag fa-fw</icon>
+                    <action>CategoriasPage</action>
+                </menuitem>
+                <menuitem label='Estoque'>
+                    <icon>fas:boxes fa-fw</icon>
+                    <action>EstoquePage</action>
+                </menuitem>
+                <menuitem label='Pedidos'>
+                    <icon>fas:clipboard-list fa-fw</icon>
+                    <action>PedidosPage</action>
+                </menuitem>
+            </menu>
+        </menuitem>
 
-    <menuitem label='Visualize'>
-        <icon>fa:list-alt fa-fw</icon>
-        <menu>
-            <menuitem label='Cliente'>
-                <icon>fa:users fa-fw</icon>
-                <action>ClientesPage</action>
-            </menuitem>
-
-            <menuitem label='Produto'>
-                <icon>fas:cube fa-fw</icon>
-                <action>ProdutosPage</action>
-            </menuitem>
-            
-            <menuitem label='Categoria'>
-                <icon>fas:tag fa-fw</icon>
-                <action>CategoriasPage</action>
-            </menuitem>
-            
-            <menuitem label='Estoque'>
-                <icon>fas:boxes fa-fw</icon>
-                <action>EstoquePage</action>
-            </menuitem>
-            
-            <menuitem label='Pedidos'>
-                <icon>fas:clipboard-list fa-fw</icon>
-                <action>PedidosPage</action>
-            </menuitem>
-            
-        </menu>
-    </menuitem>
-
-    <menuitem label="Relatórios">
-      <icon>fa:chart-pie fa-fw</icon>
-      <menu>
-          <menuitem label="Análise de Pesquisas">
-              <icon>fa:search fa-fw</icon>
-              <action>PesquisasRecentesList</action>
-          </menuitem>
-      </menu>
-  </menuitem>
+        <menuitem label="Relatórios">
+          <icon>fa:chart-pie fa-fw</icon>
+          <menu>
+              <menuitem label="Análise de Pesquisas">
+                  <icon>fa:search fa-fw</icon>
+                  <action>PesquisasRecentesList</action>
+              </menuitem>
+          </menu>
+        </menuitem>
+    </if>
 
     <menuitem label="Logout">
         <icon>fa:sign-out-alt fa-fw</icon>
-        <action>LoginForm::onLogout</action>
+        <action>Logout</action>
     </menuitem>
 </menu>

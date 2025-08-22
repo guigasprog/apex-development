@@ -1,25 +1,40 @@
 <?php
 require_once 'init.php';
-$theme  = $ini['general']['theme'];
-new TSession;
 
-$content     = file_get_contents("app/templates/{$theme}/layout.html");
-$menu_string = AdiantiMenuBuilder::parse('menu.xml', $theme);
-$content     = str_replace('{MENU}', $menu_string, $content);
-$content     = ApplicationTranslator::translateTemplate($content);
-$content     = str_replace('{LIBRARIES}', file_get_contents("app/templates/{$theme}/libraries.html"), $content);
-$content     = str_replace('{class}', isset($_REQUEST['class']) ? $_REQUEST['class'] : '', $content);
-$content     = str_replace('{template}', $theme, $content);
-$content     = str_replace('{MENU}', $menu_string, $content);
-$content     = str_replace('{lang}', $ini['general']['language'], $content);
-$css         = TPage::getLoadedCSS();
-$js          = TPage::getLoadedJS();
-$content     = str_replace('{HEAD}', $css.$js, $content);
+$ini    = AdiantiApplicationConfig::get();
+$theme  = $ini['general']['theme'];
+$class  = isset($_REQUEST['class']) ? $_REQUEST['class'] : '';
+$public = in_array($class, !empty($ini['permission']['public_classes']) ? $ini['permission']['public_classes'] : []);
+
+new TSession;
+// O serviço de autenticação padrão que você referenciou não é necessário aqui,
+// pois este index já faz a verificação manualmente.
+
+if (TSession::getValue('logged'))
+{
+    $content = file_get_contents("app/templates/{$theme}/layout.html");
+    $content = str_replace('{MENU}', AdiantiMenuBuilder::parse('menu.xml', $theme), $content);
+}
+else
+{
+    $content = file_get_contents("app/templates/{$theme}/login.html");
+}
+
+$content = ApplicationTranslator::translateTemplate($content);
+$content = AdiantiTemplateParser::parse($content);
 
 echo $content;
 
-if (isset($_REQUEST['class']))
+if (TSession::getValue('logged') || $public)
 {
-    $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
-    AdiantiCoreApplication::loadPage($_REQUEST['class'], $method, $_REQUEST);
+    if ($class)
+    {
+        $method = isset($_REQUEST['method']) ? $_REQUEST['method'] : NULL;
+        AdiantiCoreApplication::loadPage($class, $method, $_REQUEST);
+    }
+}
+else
+{
+    // Por padrão, carrega nosso formulário de login customizado
+    AdiantiCoreApplication::loadPage('LoginForm', null, $_REQUEST);
 }

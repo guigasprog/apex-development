@@ -36,7 +36,7 @@ class EstoqueForm extends TPage
 
     private function createProdutoField()
     {
-        return new TDBCombo('produto_id', 'development', 'Produto', 'id', 'nome');
+        return new TDBCombo('produto_id', 'main_db', 'Produto', 'id', 'nome');
     }
 
     private function createQuantidadeField()
@@ -54,7 +54,7 @@ class EstoqueForm extends TPage
     public function onSave($param)
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
             
             $data = $this->form->getData();
             

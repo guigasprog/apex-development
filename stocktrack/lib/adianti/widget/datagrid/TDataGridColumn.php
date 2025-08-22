@@ -8,7 +8,7 @@ use Adianti\Widget\Form\TEntry;
 /**
  * Representes a DataGrid column
  *
- * @version    7.6
+ * @version    8.2
  * @package    widget
  * @subpackage datagrid
  * @author     Pablo Dall'Oglio
@@ -33,6 +33,7 @@ class TDataGridColumn
     private $searchable;
     private $inputSearch;
     private $htmlConversion;
+    private $printable;
     
     /**
      * Class Constructor
@@ -51,6 +52,7 @@ class TDataGridColumn
         $this->properties = array();
         $this->dataProperties = array();
         $this->htmlConversion = true;
+        $this->printable = true;
     }
     
     /**
@@ -80,6 +82,14 @@ class TDataGridColumn
     }
     
     /**
+     * Disable in exporting formats
+     */
+    public function disablePrinting()
+    {
+        $this->printable = false;
+    }
+    
+    /**
      * Enable column search
      */
     public function enableSearch()
@@ -91,6 +101,7 @@ class TDataGridColumn
         $this->inputSearch = new TEntry($name);
         $this->inputSearch->setId($name);
         $this->inputSearch->{'placeholder'} = AdiantiCoreTranslator::translate('Search');
+        $this->inputSearch->{'style'} .= ';display:inline;margin-left:5px';
         $this->inputSearch->setSize('50%');
     }
     
@@ -132,6 +143,14 @@ class TDataGridColumn
     public function isSearchable()
     {
         return $this->searchable;
+    }
+    
+    /**
+     * Returns if column is printable
+     */
+    public function isPrintable()
+    {
+        return $this->printable;
     }
     
     /**

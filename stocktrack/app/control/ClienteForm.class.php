@@ -77,7 +77,7 @@ class ClienteForm extends TPage
     public function onEdit($param)
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             if (empty($param['id'])) {
                 throw new Exception('Cliente não encontrado.');
@@ -109,7 +109,7 @@ class ClienteForm extends TPage
     public function onSave()
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             $data = $this->form->getData();
 
