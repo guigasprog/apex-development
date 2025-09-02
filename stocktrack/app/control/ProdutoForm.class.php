@@ -9,6 +9,7 @@ use Adianti\Database\TTransaction;
 use Adianti\Control\TAction;
 use Adianti\Widget\Wrapper\TDBCombo;
 use Adianti\Widget\Form\TDate;
+use Adianti\Validator\TRequiredValidator; // Adicionado
 
 class ProdutoForm extends TPage
 {
@@ -23,7 +24,6 @@ class ProdutoForm extends TPage
         $this->form->setFieldSizes('100%');
 
         $this->createFormFields();
-
         $this->addActions();
 
         parent::add($this->form);
@@ -44,15 +44,23 @@ class ProdutoForm extends TPage
         $largura_cm = new TNumeric('largura_cm', 0, '', '');
         $comprimento_cm = new TNumeric('comprimento_cm', 0, '', '');
 
-        $categorias = new TDBCombo('categoria_id', 'main_db', 'Categoria', 'idCategoria', 'nome', 'nome');
+        $categorias = new TDBCombo('categoria_id', 'main_db', 'Categoria', 'id', 'nome', 'nome');
+
+        // Adicionando Validação
+        $nome->addValidation('Nome', new TRequiredValidator);
+        $preco->addValidation('Preço', new TRequiredValidator);
+        $peso_kg->addValidation('Peso (KG)', new TRequiredValidator);
+        $altura_cm->addValidation('Altura (CM)', new TRequiredValidator);
+        $largura_cm->addValidation('Largura (CM)', new TRequiredValidator);
+        $comprimento_cm->addValidation('Comprimento (CM)', new TRequiredValidator);
 
         $id->setEditable(false);
         $preco->setNumericMask(2, ',', '.', true);
         $validade->setMask('dd/mm/yyyy');
 
         $row = $this->form->addFields([new TLabel('ID'), $id],
-                                       [new TLabel('Nome<span style="color: #a00000">*</span>'), $nome],
-                                       [new TLabel('Preço por unidade<span style="color: #a00000">*</span>'), $preco]);
+                                       [new TLabel('Nome<span class="text-danger">*</span>'), $nome],
+                                       [new TLabel('Preço por unidade<span class="text-danger">*</span>'), $preco]);
         $row->layout = ['col-sm-4', 'col-sm-4', 'col-sm-4'];
 
         $row = $this->form->addFields([new TLabel('Descrição'), $descricao]);
@@ -84,6 +92,7 @@ class ProdutoForm extends TPage
         try
         {
             TTransaction::open('main_db');
+            $this->form->validate(); // Validar o formulário
             $data = $this->form->getData();
             
             $produto = new Produto();

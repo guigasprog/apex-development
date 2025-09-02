@@ -43,7 +43,7 @@ class CategoriasPage extends TPage
     {
         $this->dataGrid = new BootstrapDatagridWrapper(new TDataGrid);
         $this->dataGrid->width = '100%';
-        $this->dataGrid->addColumn(new TDataGridColumn('idCategoria', 'ID', 'left', '5%'));
+        $this->dataGrid->addColumn(new TDataGridColumn('id', 'ID', 'left', '5%'));
         $this->dataGrid->addColumn(new TDataGridColumn('nome', 'Nome', 'left', '50%'));
         $this->dataGrid->addColumn(new TDataGridColumn('descricao', 'Descrição', 'left', '45%'));
 
@@ -55,7 +55,7 @@ class CategoriasPage extends TPage
 
     private function createEditAction()
     {
-        $action_edit = new TDataGridAction([$this, 'onEdit'], ['id' => '{idCategoria}']);
+        $action_edit = new TDataGridAction([$this, 'onEdit'], ['id' => '{id}']);
         $action_edit->setLabel('Editar');
         $action_edit->setImage('fas:edit blue');
         return $action_edit;
@@ -63,7 +63,7 @@ class CategoriasPage extends TPage
 
     private function createDeleteAction()
     {
-        $action_delete = new TDataGridAction([$this, 'onDelete'], ['id' => '{idCategoria}']);
+        $action_delete = new TDataGridAction([$this, 'onDelete'], ['id' => '{id}']);
         $action_delete->setLabel('Excluir');
         $action_delete->setImage('fas:trash-alt red');
         return $action_delete;

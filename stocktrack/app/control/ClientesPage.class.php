@@ -1,202 +1,141 @@
 <?php
 
 use Adianti\Control\TPage;
-use Adianti\Widget\Datagrid\TDataGrid;
-use Adianti\Wrapper\BootstrapFormBuilder;
-use Adianti\Widget\Form\TButton;
-use Adianti\Widget\Dialog\TMessage;
-use Adianti\Widget\Dialog\TInputDialog;
+use Adianti\Control\TAction;
 use Adianti\Database\TTransaction;
 use Adianti\Database\TRepository;
+use Adianti\Database\TCriteria;
+use Adianti\Database\TFilter;
+use Adianti\Widget\Container\TPanelGroup;
+use Adianti\Widget\Container\TVBox;
+use Adianti\Widget\Datagrid\TDataGrid;
 use Adianti\Widget\Datagrid\TDataGridColumn;
 use Adianti\Widget\Datagrid\TDataGridAction;
+use Adianti\Widget\Datagrid\TPageNavigation;
+use Adianti\Widget\Dialog\TMessage;
+use Adianti\Widget\Dialog\TQuestion;
+use Adianti\Widget\Form\TButton;
+use Adianti\Widget\Form\TForm;
 
 class ClientesPage extends TPage
 {
-    private $form;
-    private $dataGrid;
+    private $datagrid;
+    private $pageNavigation;
+    private $loaded;
 
-    public function __construct()
+    public function __construct($param = null)
     {
-        parent::__construct();
+        parent::__construct($param);
 
-        $this->form = new BootstrapFormBuilder('form_clientes');
-        $this->form->setFormTitle('Clientes');
+        $this->form = new TForm('form_list_clientes');
+        $panel = new TPanelGroup('Listagem de Clientes');
+        $panel->style = 'width: 100%';
+        $this->form->add($panel);
+        
+        $add_button = new TButton('add');
+        $add_button->setAction(new TAction(['ClienteForm', 'onShow']), 'Adicionar');
+        $add_button->setImage('fas:plus green');
+        
+        $panel->addFooter($add_button);
+        
+        $this->datagrid = new TDataGrid;
+        $this->datagrid->style = 'width: 100%; margin-bottom: 10px;';
+        
+        $this->datagrid->addColumn(new TDataGridColumn('id', 'ID', 'center', '5%'));
+        $this->datagrid->addColumn(new TDataGridColumn('nome', 'Nome', 'left', '40%'));
+        $this->datagrid->addColumn(new TDataGridColumn('cpf', 'CPF', 'left', '15%'));
+        $this->datagrid->addColumn(new TDataGridColumn('email', 'Email', 'left', '20%'));
+        $this->datagrid->addColumn(new TDataGridColumn('telefone', 'Telefone', 'left', '20%'));
 
-        $this->dataGrid = $this->createDataGrid();
-        $this->form->addContent([$this->dataGrid]);
+        $action_edit = new TDataGridAction(['ClienteForm', 'onEdit'], ['id'=>'{id}']);
+        $action_del  = new TDataGridAction([$this, 'onDelete'], ['id'=>'{id}', 'nome'=>'{nome}']);
+        
+        $action_edit->setImage('fas:edit blue');
+        $action_del->setImage('fas:trash-alt red');
+        
+        $this->datagrid->addAction($action_edit);
+        $this->datagrid->addAction($action_del);
+        
+        $this->datagrid->createModel();
+        $panel->add($this->datagrid);
 
-        $this->form->addHeaderAction('Adicionar', new TAction([$this, 'onAdd']), 'fas:plus');
-
+        $this->pageNavigation = new TPageNavigation;
+        $this->pageNavigation->setAction(new TAction([$this, 'onReload']));
+        $panel->addFooter($this->pageNavigation);
+        
         parent::add($this->form);
-        $this->loadDataGrid();
     }
-
-    private function createDataGrid()
-    {
-        $dataGrid = new BootstrapDatagridWrapper(new TDataGrid);
-
-        $columns = [
-            ['id', 'ID', 'left', '5%'],
-            ['nome', 'Nome', 'left', '40%'],
-            ['cpf', 'CPF', 'left', '15%'],
-            ['email', 'Email', 'left', '20%'],
-            ['telefone', 'Telefone', 'left', '20%'],
-        ];
-
-        foreach ($columns as [$name, $label, $align, $width]) {
-            $dataGrid->addColumn(new TDataGridColumn($name, $label, $align, $width));
-        }
-
-        $actions = [
-            ['onViewAddress', 'Ver Endereço', 'fas:eye green'],
-            ['onEdit', 'Editar', 'fas:edit blue'],
-            ['onDelete', 'Excluir', 'fas:trash-alt red'],
-        ];
-
-        foreach ($actions as [$method, $label, $icon]) {
-            $action = new TDataGridAction([$this, $method], ['id' => '{id}']);
-            $action->setLabel($label);
-            $action->setImage($icon);
-            $dataGrid->addAction($action);
-        }
-
-        $dataGrid->createModel();
-
-        return $dataGrid;
-    }
-
-    public function loadDataGrid()
-    {
-        TTransaction::open('main_db');
-        $repository = new TRepository('Cliente');
-        $clientes = $repository->load();
-        $this->dataGrid->clear();
-
-        if ($clientes) {
-            $this->dataGrid->addItems($clientes);
-        }
-
-        TTransaction::close();
-    }
-
-    public function onAdd()
-    {
-        TApplication::gotoPage('ClienteForm');
-    }
-
-    public function onEdit($param)
-    {
-        AdiantiCoreApplication::loadPage('ClienteForm', 'onEdit', ['id' => $param['id']]);
-    }
-
-    public function onDelete($param)
-    {
-        TTransaction::open('main_db');
-        
-        $pedidoRepository = new TRepository('Pedido');
-        $criteria = new TCriteria;
-        $criteria->add(new TFilter('cliente_id', '=', $param['id']));
-        $criteria->add(new TFilter('status', '=', 'pendente'));
-        $pedidosPendentes = $pedidoRepository->count($criteria);
-        
-        if ($pedidosPendentes > 0) {
-            new TMessage('error', 'O cliente possui pedidos pendentes e não pode ser excluído.');
-            TTransaction::close();
-            return;
-        }
-
-        TTransaction::close();
-
-        $action = new TAction([$this, 'deleteCliente']);
-        $action->setParameters($param);
-
-        new TQuestion('Deseja realmente excluir este cliente?', $action);
-    }
-
-
-    public function deleteCliente($param)
+    
+    public function onReload($param = NULL)
     {
         try {
             TTransaction::open('main_db');
-            $cliente = new Cliente($param['id']);
-            $cliente->delete();
+            $repository = new TRepository('Cliente');
+            $limit = 10;
+            $criteria = new TCriteria;
+            
+            $criteria->setProperty('limit', $limit);
+            $criteria->setProperty('offset', (isset($param['offset'])) ? $param['offset'] : 0);
+            $criteria->setProperty('order', 'id asc');
+            
+            $clientes = $repository->load($criteria, FALSE);
+            $this->datagrid->clear();
+            
+            if ($clientes) {
+                $this->datagrid->addItems($clientes);
+            }
+            
+            $criteria->resetProperties();
+            $count = $repository->count($criteria);
+            $this->pageNavigation->setCount($count);
+            $this->pageNavigation->setProperties($param);
+            $this->pageNavigation->setLimit($limit);
+            
             TTransaction::close();
-
-            $this->loadDataGrid();
-            new TMessage('info', 'Cliente excluído com sucesso!');
+            $this->loaded = true;
         } catch (Exception $e) {
             new TMessage('error', $e->getMessage());
             TTransaction::rollback();
         }
     }
 
-    public function onViewAddress($param)
+    public function onDelete($param)
     {
-        TTransaction::open('main_db');
-        $cliente = new Cliente($param['id']);
+        $action = new TAction([$this, 'deleteConfirmado']);
+        $action->setParameters($param);
+        new TQuestion("Deseja realmente excluir o cliente \"{$param['nome']}\"?", $action);
+    }
 
-        if ($cliente->endereco_id) {
-            $endereco = new Endereco($cliente->endereco_id);
-            $dialogForm = $this->createAddressDialogForm($endereco);
-            new TInputDialog('Endereço do Cliente', $dialogForm);
-        } else {
-            new TMessage('info', 'Endereço não cadastrado para este cliente.');
+    public function deleteConfirmado($param)
+    {
+        try {
+            TTransaction::open('main_db');
+            
+            $has_pedidos = Pedido::where('cliente_id', '=', $param['id'])->count();
+            if ($has_pedidos > 0) {
+                throw new Exception('O cliente possui pedidos e não pode ser excluído.');
+            }
+            
+            $cliente = new Cliente($param['id']);
+            
+            if ($cliente->endereco_id) {
+                (new Endereco($cliente->endereco_id))->delete();
+            }
+            $cliente->delete();
+            
+            TTransaction::close();
+            
+            $this->onReload($param);
+            new TMessage('info', 'Cliente excluído com sucesso!');
+        } catch (Exception $e) {
+            new TMessage('error', $e->getMessage());
+            TTransaction::rollback();
         }
-
-        TTransaction::close();
     }
-
-    private function createAddressDialogForm($endereco)
+    
+    public function onShow($param = null)
     {
-        $dialogForm = new BootstrapFormBuilder('form_view_address');
-        $dialogForm->setFieldSizes('100%');
-
-        $cep = new TEntry('cep');
-        $cep->setValue($endereco->cep);
-        $cep->setEditable(false);
-        
-        $logradouro = new TEntry('logradouro');
-        $logradouro->setValue($endereco->logradouro);
-        $logradouro->setEditable(false);
-        
-        $numero = new TEntry('numero');
-        $numero->setValue($endereco->numero);
-        $numero->setEditable(false);
-
-        $dialogForm->addFields(
-            [new TLabel('CEP'), $cep],
-            [new TLabel('Logradouro'), $logradouro],
-            [new TLabel('Número'), $numero]
-        )->layout = ['col-sm-4', 'col-sm-5', 'col-sm-3'];
-
-        $bairro = new TEntry('bairro');
-        $bairro->setValue($endereco->bairro);
-        $bairro->setEditable(false);
-
-        $cidade = new TEntry('cidade');
-        $cidade->setValue($endereco->cidade);
-        $cidade->setEditable(false);
-
-        $estado = new TEntry('estado');
-        $estado->setValue($endereco->estado);
-        $estado->setEditable(false);
-
-        $dialogForm->addFields(
-            [new TLabel('Bairro'), $bairro],
-            [new TLabel('Cidade'), $cidade],
-            [new TLabel('Estado'), $estado]
-        )->layout = ['col-sm-5', 'col-sm-4', 'col-sm-3'];
-
-        $complemento = new TEntry('complemento');
-        $complemento->setValue($endereco->complemento);
-        $complemento->setEditable(false);
-
-        $dialogForm->addFields(
-            [new TLabel('Complemento'), $complemento]
-        )->layout = ['col-sm-12'];
-
-        return $dialogForm;
+        $this->onReload($param);
+        parent::show();
     }
-
 }

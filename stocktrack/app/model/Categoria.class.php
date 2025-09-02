@@ -4,7 +4,7 @@ use Adianti\Database\TRecord;
 class Categoria extends TRecord
 {
     const TABLENAME = 'categorias';
-    const PRIMARYKEY = 'idCategoria';
+    const PRIMARYKEY = 'id';
     const IDPOLICY = 'serial';
 
     public function __construct($id = NULL)

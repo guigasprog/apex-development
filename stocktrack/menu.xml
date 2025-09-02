@@ -1,91 +1,98 @@
 <menu>
-    <menuitem label="Menu Principal">
-        <icon>fas:home fa-fw</icon>
+    <menuitem label="Início">
+        <icon>fa:home fa-fw</icon>
         <action>WelcomeView</action>
     </menuitem>
 
-    <if condition="TSession::getValue('is_super_admin') == true">
-        <menuitem label="Administração">
-            <icon>fa:cogs</icon>
-            <menu>
-                <menuitem label="Gerenciar Tenants">
-                    <icon>fa:building</icon>
-                    <action>TenantList</action>
-                </menuitem>
-            </menu>
-        </menuitem>
-    </if>
+    <menuitem label="Gestão da Loja">
+        <icon>fa:store fa-fw</icon>
+        <menu>
+            <menuitem label="Clientes">
+                <icon>fa:user</icon>
+                <action>ClientesPage</action>
+            </menuitem>
+            <menuitem label="Produtos">
+                <icon>fa:box</icon>
+                <action>ProdutosPage</action>
+            </menuitem>
+            <menuitem label="Pedidos">
+                <icon>fa:shopping-cart</icon>
+                <action>PedidosPage</action>
+            </menuitem>
+            <menuitem label="Estoque">
+                <icon>fa:box-open</icon>
+                <action>EstoquePage</action>
+            </menuitem>
+        </menu>
+    </menuitem>
 
-    <if condition="TSession::getValue('is_super_admin') !== true">
-        <menuitem label='Cadastro'>
-            <icon>fa:file-alt fa-fw</icon>
-            <menu>
-                <menuitem label='Estoque'>
-                    <icon>fas:boxes fa-fw</icon>
-                    <action>EstoqueForm</action>
-                </menuitem>
-                <menuitem label='Cliente'>
-                    <icon>fa:user fa-fw</icon>
-                    <action>ClienteForm</action>
-                </menuitem>
-                <menuitem label='Categoria'>
-                    <icon>fas:tag fa-fw</icon>
-                    <action>CategoriaForm</action>
-                </menuitem>
-                <menuitem label='Produto'>
-                    <icon>fas:cube fa-fw</icon>
-                    <action>ProdutoForm</action>
-                </menuitem>
-                <menuitem label='Imagem do Produto'>
-                    <icon>fa:image fa-fw</icon>
-                    <action>ImagensProdutosForm</action>
-                </menuitem>
-                <menuitem label='Pedidos'>
-                    <icon>fas:truck fa-fw</icon>
-                    <action>PedidoForm</action>
-                </menuitem>
-            </menu>
-        </menuitem>
-
-        <menuitem label='Visualize'>
-            <icon>fa:list-alt fa-fw</icon>
-            <menu>
-                <menuitem label='Cliente'>
-                    <icon>fa:users fa-fw</icon>
-                    <action>ClientesPage</action>
-                </menuitem>
-                <menuitem label='Produto'>
-                    <icon>fas:cube fa-fw</icon>
-                    <action>ProdutosPage</action>
-                </menuitem>
-                <menuitem label='Categoria'>
-                    <icon>fas:tag fa-fw</icon>
-                    <action>CategoriasPage</action>
-                </menuitem>
-                <menuitem label='Estoque'>
-                    <icon>fas:boxes fa-fw</icon>
-                    <action>EstoquePage</action>
-                </menuitem>
-                <menuitem label='Pedidos'>
-                    <icon>fas:clipboard-list fa-fw</icon>
-                    <action>PedidosPage</action>
-                </menuitem>
-            </menu>
-        </menuitem>
-
-        <menuitem label="Relatórios">
-          <icon>fa:chart-pie fa-fw</icon>
-          <menu>
-              <menuitem label="Análise de Pesquisas">
-                  <icon>fa:search fa-fw</icon>
-                  <action>PesquisasRecentesList</action>
-              </menuitem>
-          </menu>
-        </menuitem>
-    </if>
-
-    <menuitem label="Logout">
-        <icon>fa:sign-out-alt fa-fw</icon>
-        <action>Logout</action>
+    <menuitem label="Gerenciamento Avançado">
+        <icon>fa:cogs fa-fw</icon>
+        <menu>
+            <menuitem label="Categorias de Produtos">
+                <icon>fa:clone</icon>
+                <action>CategoriasPage</action>
+            </menuitem>
+            <menuitem label="Adicionar Estoque">
+                <icon>fa:plus-circle</icon>
+                <action>EstoqueForm</action>
+            </menuitem>
+            <menuitem label="Imagens de Produtos">
+                <icon>fa:image</icon>
+                <action>ImagensProdutosForm</action>
+            </menuitem>
+             <menuitem label="Relatórios">
+                <icon>fa:chart-pie</icon>
+                <action>PesquisasRecentesList</action>
+            </menuitem>
+        </menu>
+    </menuitem>
+    
+    <menuitem label='Administração do Sistema'>
+        <icon>fas:sliders fa-fw</icon>
+        <menu>
+            <menuitem label='Dashboard'>
+                <icon>fas:tachometer-alt fa-fw</icon>
+                <action>SystemAdministrationDashboard</action>
+            </menuitem>
+            <menuitem label='Programas'>
+                <icon>far:file-code fa-fw</icon>
+                <action>SystemProgramList</action>
+            </menuitem>
+            <menuitem label='Grupos'>
+                <icon>fas:users fa-fw</icon>
+                <action>SystemGroupList</action>
+            </menuitem>
+            <menuitem label='Usuários'>
+                <icon>fas:user fa-fw</icon>
+                <action>SystemUserList</action>
+            </menuitem>
+             <menuitem label="Gerenciar Tenants">
+                <icon>fa:building</icon>
+                <action>TenantList</action>
+            </menuitem>
+        </menu>
+    </menuitem>
+    
+    <menuitem label="Logs do Sistema">
+        <icon>fas:desktop fa-fw</icon>
+        <menu>
+            <menuitem label='Dashboard de Logs'>
+                <icon>fas:tachometer-alt fa-fw</icon>
+                <action>SystemLogDashboard</action>
+            </menuitem>
+            <menuitem label='Log de Acesso'>
+                <icon>fas:key fa-fw</icon>
+                <action>SystemAccessLogList</action>
+            </menuitem>
+            <menuitem label='Log de Alterações'>
+                <icon>fas:film fa-fw</icon>
+                <action>SystemChangeLogView</action>
+            </menuitem>
+            <menuitem label='Log de SQL'>
+                <icon>fas:database fa-fw</icon>
+                <action>SystemSqlLogList</action>
+            </menuitem>
+        </menu>
     </menuitem>
 </menu>

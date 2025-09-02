@@ -24,7 +24,7 @@ class LoginForm extends TPage
         $panel = new TPanelGroup('Acessar o Sistema');
         $panel->style = 'max-width: 450px; margin: auto; margin-top: 10vh;';
 
-        $this->form = new TForm('form_login');
+        $this->form = new TForm('form_login'); // TForm não possui addFields
         
         $login    = new TEntry('login');
         $password = new TPassword('password');
@@ -47,6 +47,7 @@ class LoginForm extends TPage
         $login_button->setImage('fas:sign-in-alt');
         $login_button->setAction(new TAction([$this, 'onLogin']), 'Login');
         
+        // Correção: Usando addField para cada campo
         $this->form->addField($login);
         $this->form->addField($password);
         $this->form->addField($login_button);
@@ -61,7 +62,7 @@ class LoginForm extends TPage
     {
         try
         {
-            TTransaction::open('database');
+            TTransaction::open('main_db');
             $data = (object) $param;
             
             if (empty($data->login)) { throw new Exception('O campo Email é obrigatório'); }

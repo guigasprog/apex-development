@@ -19,5 +19,5 @@ return [
     
     'highlight' => [ 'comment' => '#808080', 'default' => '#FFFFFF', 'html' => '#C0C0C0', 'keyword' => '#62d3ea', 'string' => '#FFC472', ],
     'login' => [ 'logo' => '', 'background' => '' ],
-    'template' => [ 'navbar' => [ 'has_program_search' => '1', ], 'dialogs' => [ 'use_swal' => '1' ], ],
+    'template' => [ 'navbar' => [ 'has_program_search' => '0', ], 'dialogs' => [ 'use_swal' => '1' ], ],
 ];

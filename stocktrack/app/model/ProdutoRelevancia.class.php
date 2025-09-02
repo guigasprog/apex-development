@@ -3,7 +3,7 @@ use Adianti\Database\TRecord;
 
 class ProdutoRelevancia extends TRecord
 {
-    const TABLENAME = 'produto_relevancia';
+    const TABLENAME = 'produto_interacoes';
     const PRIMARYKEY= 'id';
     const IDPOLICY =  'serial';
 

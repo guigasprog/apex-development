@@ -7,6 +7,7 @@ use Adianti\Wrapper\BootstrapFormBuilder;
 use Adianti\Database\TTransaction;
 use Adianti\Widget\Dialog\TMessage;
 use Adianti\Control\TAction;
+use Adianti\Validator\TRequiredValidator; // Adicionado
 
 class CategoriaForm extends TPage
 {
@@ -28,16 +29,18 @@ class CategoriaForm extends TPage
     
     private function initializeFormFields()
     {
-        $id = new TEntry('idCategoria');
+        $id = new TEntry('id');
         $nome = new TEntry('nome');
         $descricao = new TEntry('descricao');
+
+        $nome->addValidation('Nome', new TRequiredValidator); // Adicionado
 
         $id->setEditable(false);
         $nome->setSize('100%');
         $descricao->setSize('100%');
 
         $this->form->addFields([new TLabel('ID')], [$id]);
-        $this->form->addFields([new TLabel('Nome<span style="color: #a00000">*</span>')], [$nome]);
+        $this->form->addFields([new TLabel('Nome<span class="text-danger">*</span>')], [$nome]);
         $this->form->addFields([new TLabel('Descrição')], [$descricao]);
     }
 
@@ -52,8 +55,8 @@ class CategoriaForm extends TPage
         try {
             TTransaction::open('main_db');
 
+            $this->form->validate(); // Adicionado
             $data = $this->form->getData();
-            $this->validateData($data);
 
             $categoria = new Categoria();
             $categoria->fromArray((array) $data);
@@ -66,13 +69,6 @@ class CategoriaForm extends TPage
         } catch (Exception $e) {
             new TMessage('error', $e->getMessage());
             TTransaction::rollback();
-        }
-    }
-
-    private function validateData($data)
-    {
-        if (empty($data->nome)) {
-            throw new Exception('O campo "Nome" é obrigatório.');
         }
     }
 

@@ -1,0 +1,50 @@
+<menu>
+    <menuitem label="Início">
+        <icon>fa:home fa-fw</icon>
+        <action>WelcomeView</action>
+    </menuitem>
+
+    <menuitem label="Gestão da Loja">
+        <icon>fa:store fa-fw</icon>
+        <menu>
+            <menuitem label="Clientes">
+                <icon>fa:user</icon>
+                <action>ClientesPage</action>
+            </menuitem>
+            <menuitem label="Produtos">
+                <icon>fa:box</icon>
+                <action>ProdutosPage</action>
+            </menuitem>
+            <menuitem label="Pedidos">
+                <icon>fa:shopping-cart</icon>
+                <action>PedidosPage</action>
+            </menuitem>
+            <menuitem label="Estoque">
+                <icon>fa:box-open</icon>
+                <action>EstoquePage</action>
+            </menuitem>
+        </menu>
+    </menuitem>
+
+    <menuitem label="Gerenciamento Avançado">
+        <icon>fa:cogs fa-fw</icon>
+        <menu>
+            <menuitem label="Categorias de Produtos">
+                <icon>fa:clone</icon>
+                <action>CategoriasPage</action>
+            </menuitem>
+            <menuitem label="Adicionar Estoque">
+                <icon>fa:plus-circle</icon>
+                <action>EstoqueForm</action>
+            </menuitem>
+            <menuitem label="Imagens de Produtos">
+                <icon>fa:image</icon>
+                <action>ImagensProdutosForm</action>
+            </menuitem>
+            <menuitem label="Relatórios">
+                <icon>fa:chart-pie</icon>
+                <action>PesquisasRecentesList</action>
+            </menuitem>
+        </menu>
+    </menuitem>
+</menu>

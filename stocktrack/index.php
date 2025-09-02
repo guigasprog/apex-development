@@ -1,23 +1,42 @@
 <?php
 require_once 'init.php';
 
-$ini    = AdiantiApplicationConfig::get();
+$ini = AdiantiApplicationConfig::get();
 $theme  = $ini['general']['theme'];
 $class  = isset($_REQUEST['class']) ? $_REQUEST['class'] : '';
 $public = in_array($class, !empty($ini['permission']['public_classes']) ? $ini['permission']['public_classes'] : []);
 
+// O ideal é usar um serviço de autenticação se ele existir, mas vamos manter a verificação manual por enquanto.
 new TSession;
-// O serviço de autenticação padrão que você referenciou não é necessário aqui,
-// pois este index já faz a verificação manualmente.
 
-if (TSession::getValue('logged'))
+if ( TSession::getValue('logged') )
 {
-    $content = file_get_contents("app/templates/{$theme}/layout.html");
-    $content = str_replace('{MENU}', AdiantiMenuBuilder::parse('menu.xml', $theme), $content);
+    if (isset($_REQUEST['template']) AND $_REQUEST['template'] == 'iframe')
+    {
+        $content = file_get_contents("app/templates/{$theme}/iframe.html");
+    }
+    else
+    {
+        $content = file_get_contents("app/templates/{$theme}/layout.html");
+        $content = str_replace('{MENU}', AdiantiMenuBuilder::parse('menu.xml', $theme), $content);
+        $content = str_replace('{MENUTOP}', AdiantiMenuBuilder::parseNavBar('menu-top.xml', $theme), $content);
+        $content = str_replace('{MENUBOTTOM}', AdiantiMenuBuilder::parseNavBar('menu-bottom.xml', $theme), $content);
+    }
 }
 else
 {
-    $content = file_get_contents("app/templates/{$theme}/login.html");
+    if (isset($ini['general']['public_view']) && $ini['general']['public_view'] == '1')
+    {
+        $content = file_get_contents("app/templates/{$theme}/public.html");
+        $menu    = AdiantiMenuBuilder::parse('menu-public.xml', $theme);
+        $content = str_replace('{MENU}', $menu, $content);
+        $content = str_replace('{MENUTOP}', AdiantiMenuBuilder::parseNavBar('menu-top.xml', $theme), $content);
+        $content = str_replace('{MENUBOTTOM}', AdiantiMenuBuilder::parseNavBar('menu-bottom.xml', $theme), $content);
+    }
+    else
+    {
+        $content = file_get_contents("app/templates/{$theme}/login.html");
+    }
 }
 
 $content = ApplicationTranslator::translateTemplate($content);
@@ -25,7 +44,7 @@ $content = AdiantiTemplateParser::parse($content);
 
 echo $content;
 
-if (TSession::getValue('logged') || $public)
+if (TSession::getValue('logged') OR $public)
 {
     if ($class)
     {
@@ -35,6 +54,15 @@ if (TSession::getValue('logged') || $public)
 }
 else
 {
-    // Por padrão, carrega nosso formulário de login customizado
-    AdiantiCoreApplication::loadPage('LoginForm', null, $_REQUEST);
+    if (isset($ini['general']['public_view']) && $ini['general']['public_view'] == '1')
+    {
+        if (!empty($ini['general']['public_entry']))
+        {
+            AdiantiCoreApplication::loadPage($ini['general']['public_entry'], '', $_REQUEST);
+        }
+    }
+    else
+    {
+        AdiantiCoreApplication::loadPage('LoginForm', '', $_REQUEST);
+    }
 }

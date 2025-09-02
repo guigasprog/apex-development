@@ -2,7 +2,7 @@
 class Endereco extends TRecord
 {
     const TABLENAME = 'enderecos';
-    const PRIMARYKEY = 'idEndereco';
+    const PRIMARYKEY = 'id';
     const IDPOLICY = 'serial'; // Incrementa automaticamente o ID
 
 

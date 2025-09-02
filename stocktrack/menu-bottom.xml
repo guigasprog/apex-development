@@ -1,0 +1,10 @@
+<menu>
+    <menuitem label="Sobre">
+        <icon>fa:info-circle</icon>
+        <action>AboutView</action>
+    </menuitem>
+    <menuitem label="Contato">
+        <icon>fa:envelope</icon>
+        <action>ContactView</action>
+    </menuitem>
+</menu>

@@ -16,7 +16,7 @@ class EstoqueForm extends TPage
     {
         parent::__construct();
         $this->form = new BootstrapFormBuilder('form_estoque');
-        $this->form->addContent( ['<h4>Atualizar Estoque</h4><hr>'] );
+        $this->form->setFormTitle( ['Atualizar Estoque'] );
         $this->form->setFieldSizes('100%');
 
         $this->addFieldsToForm();

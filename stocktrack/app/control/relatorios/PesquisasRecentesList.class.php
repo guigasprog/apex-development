@@ -10,7 +10,6 @@ use Adianti\Widget\Datagrid\TDataGrid;
 use Adianti\Widget\Datagrid\TDataGridColumn;
 use Adianti\Widget\Datagrid\TPageNavigation;
 use Adianti\Wrapper\BootstrapDatagridWrapper;
-use Exception;
 
 class PesquisasRecentesList extends TPage
 {
@@ -71,7 +70,7 @@ class PesquisasRecentesList extends TPage
     public function onReload($param = null)
     {
         try {
-            TTransaction::open('development');
+            TTransaction::open('main_db');
 
             $repository = new TRepository('ProdutoRelevancia');
             $limit = 10;
@@ -79,7 +78,7 @@ class PesquisasRecentesList extends TPage
             $criteria = new TCriteria;
             $criteria->setProperties($param); // page, order, direction
             $criteria->setProperty('limit', $limit);
-            $criteria->add(new TFilter('tipo_relevancia', '=', 'search'));
+            $criteria->add(new TFilter('tipo', '=', 'search'));
             $criteria->setProperty('order', 'created_at desc');
 
             $objects = $repository->load($criteria, FALSE);
