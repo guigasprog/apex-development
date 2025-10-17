@@ -2,11 +2,11 @@ export const environment = {
   production: false,
   imageBaseUrl: 'http://172.20.0.131/vibe-vault/stocktrack/',
 
-  authApi: 'http://172.20.0.131:4001/api/auth',
+  tenantsApi: 'http://apex-store.com:3000/api/tenant',
 
-  productsApi: 'http://172.20.0.131:4002/api/products',
+  productsApi: 'http://apex-store.com:3000/api/products',
 
-  ordersApi: 'http://172.20.0.131:4003/api/orders',
+  ordersApi: 'http://apex-store.com:3000/api/orders',
 
-  shippingApi: 'http://172.20.0.131:4004/api/shipping',
+  shippingApi: 'http://apex-store.com:3000/api/shipping',
 };

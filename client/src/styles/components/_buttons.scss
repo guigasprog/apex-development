@@ -1,0 +1,35 @@
+// =================================================================
+// BOTÕES
+// =================================================================
+@use '../base/variables' as *;
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn {
+  border: none;
+  padding: 12px 15px;
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: inherit;
+  transition: all 0.2s ease-out;
+
+  &--primary {
+    background-color: $primary-color;
+    color: white;
+    flex-grow: 1;
+  }
+
+  &--secondary {
+    background-color: transparent;
+    border: 1px solid $secondary-color;
+    color: $secondary-color;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 1.2rem;
+  }
+}

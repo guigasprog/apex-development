@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  authApi: 'https://api.vibevault.com.br/auth',
-  productsApi: 'https://api.vibevault.com.br/products',
-  ordersApi: 'https://api.vibevault.com.br/orders',
-  shippingApi: 'https://api.vibevault.com.br/shipping',
+  authApi: 'https://api.apex-store.com/auth',
+  productsApi: 'https://api.apex-store.com/products',
+  ordersApi: 'https://api.apex-store.com/orders',
+  shippingApi: 'https://api.apex-store.com/shipping',
 };

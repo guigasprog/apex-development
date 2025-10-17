@@ -1,0 +1,84 @@
+<menu>
+    <menuitem label='Dashboard'>
+        <menu>
+            <menuitem label='Dashboard'>
+                <icon>fas:home fa-fw</icon>
+                <action>WelcomeView</action>
+            </menuitem>
+            
+            <menuitem label='Catalogo'>
+                <icon>fas:book-open fa-fw</icon>
+                <menu>
+                    <menuitem label='Produtos'>
+                        <icon>fas:box-open fa-fw</icon>
+                        <menu>
+                            <menuitem label='Exibir'>
+                                <icon>fas:eye fa-fw</icon>
+                                <action>ProductList</action>
+                            </menuitem>
+                            <menuitem label='Formulário'>
+                                <icon>fas:plus fa-fw</icon>
+                                <action>ProductForm</action>
+                            </menuitem>
+                        </menu>
+                    </menuitem>
+                    <menuitem label='Categorias'>
+                        <icon>fas:tags fa-fw</icon>
+                        <menu>
+                            <menuitem label='Exibir'>
+                                <icon>fas:eye fa-fw</icon>
+                                <action>CategoriesList</action>
+                            </menuitem>
+                            <menuitem label='Formulário'>
+                                <icon>fas:plus fa-fw</icon>
+                                <action>CategoryForm</action>
+                            </menuitem>
+                        </menu>
+                    </menuitem>
+                </menu>
+            </menuitem>
+            
+            <menuitem label='Vendas'>
+                <icon>fas:shopping-cart fa-fw</icon>
+                <menu>
+                    <menuitem label='Ordens'>
+                        <icon>fas:receipt fa-fw</icon>
+                        <menu>
+                            <menuitem label='Exibir'>
+                                <icon>fas:eye fa-fw</icon>
+                                <action>OrderList</action>
+                            </menuitem>
+                            <menuitem label='Formulário'>
+                                <icon>fas:plus fa-fw</icon>
+                                <action>OrderForm</action>
+                            </menuitem>
+                        </menu>
+                    </menuitem>
+                    <menuitem label='Clientes'>
+                        <icon>fas:user-friends fa-fw</icon>
+                        <menu>
+                            <menuitem label='Exibir'>
+                                <icon>fas:eye fa-fw</icon>
+                                <action>CustomerList</action>
+                            </menuitem>
+                            <menuitem label='Formulário'>
+                                <icon>fas:plus fa-fw</icon>
+                                <action>CustomerForm</action>
+                            </menuitem>
+                        </menu>
+                    </menuitem>
+                </menu>
+            </menuitem>
+            
+            <menuitem label='Configuração'>
+                <icon>fas:cogs fa-fw</icon>
+                <menu>
+                    <menuitem label='Loja'>
+                        <icon>fas:store fa-fw</icon>
+                        <action>StoreSettingsForm</action>
+                    </menuitem>
+                </menu>
+            </menuitem>
+        </menu>
+    </menuitem>
+</menu>

@@ -1,1 +1,41 @@
-<router-outlet></router-outlet>
+<ng-container *ngIf="theme$ | async as theme; else loading">
+
+  <header class="store-header">
+    <img [src]="'http://localhost/' + theme.url_logo" [alt]="theme.nome_loja" class="store-header__logo">
+    <h1 class="store-header__title">{{ theme.nome_loja }}</h1>
+  </header>
+
+  <main class="store-content">
+    <h2 class="store-content__title">Nossos Produtos</h2>
+
+    <div class="product-card"
+      [ngClass]="theme.hover_effect === 'default' ? 'hover-effect-default-card' : 'hover-effect-' + theme.hover_effect">
+
+      <img class="product-card__image" src="https://api.iconify.design/ph:mouse-duotone.svg?color=%23888888"
+        alt="Produto Exemplo">
+
+      <div class="product-card__info">
+        <h4 class="product-card__title">Produto Exemplo</h4>
+        <p class="product-card__description">Uma breve descrição deste incrível produto para demonstração visual.</p>
+
+        <div class="button-group">
+          <button class="btn btn--primary"
+            [ngClass]="theme.hover_effect === 'default' ? 'hover-effect-default-button' : 'hover-effect-' + theme.hover_effect">Comprar
+            Agora</button>
+
+          <button class="btn btn--secondary"
+            [ngClass]="theme.hover_effect === 'default' ? 'hover-effect-default-button' : 'hover-effect-' + theme.hover_effect">
+            <i class="fa fa-heart"></i> </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</ng-container>
+
+<ng-template #loading>
+  <div class="loading-spinner">
+    Carregando sua loja...
+  </div>
+</ng-template>

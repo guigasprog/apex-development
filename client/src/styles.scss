@@ -1,48 +1,44 @@
-@import "primeicons/primeicons.css";
+// =================================================================
+// ARQUIVO PRINCIPAL DE ESTILOS
+// =================================================================
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// 1. Base (Variáveis, Mixins, Estilos Globais)
+@use 'styles/base/variables';
+@use 'styles/base/mixins';
+@use 'styles/base/base';
 
-@layer reset, primeng;
+// 2. Layout (Estrutura da página)
+@use 'styles/layout/header';
 
-:root {
-  --color-background: #121212;
-  --color-surface: #1e1e1e;
-  --color-text-primary: #f5f5f5;
-  --color-text-secondary: #a1a1aa;
-  --color-accent: #bef264;
-  --font-family-sans: "Inter", sans-serif;
+// 3. Componentes (Peças reutilizáveis da UI)
+@use 'styles/components/buttons';
+@use 'styles/components/product-card';
+
+// 4. Efeitos de Hover (Classes dinâmicas)
+// Essas classes são aplicadas via [ngClass] no Angular
+.hover-effect-default-card:hover,
+.hover-effect-scale:hover {
+  transform: scale(1.02);
 }
 
-body {
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
-  font-family: var(--font-family-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.hover-effect-elevate:hover {
+  transform: translateY(-5px);
 }
 
-a {
-  color: var(--color-accent);
-  text-decoration: none;
-  transition: color 0.2s ease-in-out;
+.hover-effect-default-button:hover {
+  filter: brightness(0.9);
 }
 
-a:hover {
-  color: white;
+#preview-card.hover-effect-glow:hover {
+  box-shadow: 0 0 20px 0 var(--shadow-color, rgba(0, 0, 0, 0.2)) !important;
 }
 
-.p-button {
-  transition: background-color 0.2s, color 0.2s;
-}
-
-@layer components {
-  .title-brand {
-    @apply text-2xl font-bold text-brand-accent mb-4;
-  }
-}
-
-.meu-carrossel-customizado .p-carousel-item {
-  flex: none !important;
+// Estilos de Loading
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  font-size: 1.5rem;
+  color: #888;
 }

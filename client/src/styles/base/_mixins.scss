@@ -1,0 +1,20 @@
+// =================================================================
+// MIXINS
+// =================================================================
+
+@use 'variables' as *;
+
+// Mixin para centralizar conteúdo com flexbox
+@mixin flex-center($direction: column) {
+  display: flex;
+  flex-direction: $direction;
+  align-items: center;
+  justify-content: center;
+}
+
+// Mixin para media queries (Mobile-First)
+@mixin tablet-up {
+  @media (min-width: $breakpoint-tablet) {
+    @content;
+  }
+}

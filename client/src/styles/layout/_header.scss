@@ -1,0 +1,23 @@
+// =================================================================
+// CABEÇALHO DA LOJA
+// =================================================================
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.store-header {
+  @include flex-center();
+  margin-bottom: 3rem;
+  text-align: center;
+
+  &__logo {
+    max-width: 180px;
+    max-height: 90px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: 2.5rem;
+    color: $primary-color;
+  }
+}

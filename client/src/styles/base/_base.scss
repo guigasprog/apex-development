@@ -1,0 +1,32 @@
+// =================================================================
+// ESTILOS GLOBAIS
+// =================================================================
+@use 'variables' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 2rem 1rem;
+  font-family: $font-family-base;
+  background-color: $bg-color-light;
+  color: $text-color-light;
+  transition: background-color 0.3s, color 0.3s;
+
+  // Lógica do Tema Escuro
+  &.dark-theme {
+    background-color: $bg-color-dark;
+    color: $text-color-dark;
+  }
+}
+
+h1,
+h2,
+h4,
+p {
+  margin: 0;
+}
