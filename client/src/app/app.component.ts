@@ -1,3 +1,4 @@
+import { environment } from './../environments/environment';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; // <-- 1. IMPORT CommonModule
 import { TenantService } from './services/tenant.service';
@@ -18,7 +19,7 @@ export class AppComponent implements OnInit {
 
   constructor(private tenantService: TenantService) {
     this.theme$ = this.tenantService.tenantTheme$;
-    this.apiBaseUrl = this.tenantService.apiBaseUrl;
+    this.apiBaseUrl = environment.imageDB;
   }
 
   ngOnInit(): void {

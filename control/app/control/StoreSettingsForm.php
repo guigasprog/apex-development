@@ -21,24 +21,46 @@ use Adianti\Wrapper\BootstrapFormBuilder;
 class StoreSettingsForm extends TPage
 {
     protected $form;
-    protected $logo_preview;
 
     public function __construct($param)
     {
         parent::__construct($param);
         
+        // --- 1. Busca todos os dados de personalização do banco de dados ---
+        try {
+            TTransaction::open('permission');
+            $all_colors = CustomColor::getObjects();
+            $all_fonts = CustomFont::getObjects();
+            $all_hovers = CustomHoverEffect::getObjects();
+            TTransaction::close();
+        } catch (Exception $e) {
+            new TMessage('error', 'Falha ao carregar dados de personalização: ' . $e->getMessage());
+            return;
+        }
+
+        // --- 2. Prepara e injeta os assets dinâmicos (fontes e CSS) ---
+        foreach ($all_fonts as $font) {
+            TPage::include_css($font->import_url);
+        }
+        
+        $style = new TElement('style');
+        foreach ($all_hovers as $hover) {
+            $style->add($hover->css_code . "\n");
+        }
+        parent::add($style);
+
+        // --- 3. Monta o formulário ---
         $hbox = new THBox;
         $hbox->style = 'width: 100%; display: flex';
 
         $this->form = new BootstrapFormBuilder('form_store_settings');
-        $this->form->setFormTitle('Configurações da Loja');
         $this->form->enctype = 'multipart/form-data';
         
         // --- Campos do Formulário ---
         $id                 = new THidden('id');
         $theme_id           = new THidden('theme_id');
         $nome_loja          = new TEntry('nome_loja');
-        $url_logo     = new TFile('url_logo');
+        $url_logo           = new TFile('url_logo');
         $background_mode    = new TRadioGroup('background_mode');
         $primary_color      = new TCombo('primary_color');
         $secondary_color    = new TCombo('secondary_color');
@@ -47,38 +69,28 @@ class StoreSettingsForm extends TPage
         $border_radius_px   = new TSlider('border_radius_px');
         $hover_effect       = new TCombo('hover_effect');
 
-        // --- Configuração dos campos ---
         $nome_loja->addValidation('Nome da Loja', new TRequiredValidator);
         $url_logo->setAllowedExtensions(['jpg', 'jpeg', 'png', 'gif', 'svg']);
+  
+        $logo_container = new THBox;
+        $logo_container->add($url_logo);
         
         $background_mode->addItems(['light' => 'Claro (Light)', 'dark' => 'Escuro (Dark)']);
         $background_mode->setLayout('horizontal');
         $background_mode->setValue('light');
-
-        $primary_color->addItems(['default' => 'Padrão (Azul)', 'greenlime' => 'Verde Lima', 'purple' => 'Roxo', 'orange' => 'Laranja']);
-        $secondary_color->addItems(['default' => 'Padrão', 'red' => 'Vermelho', 'yellow' => 'Amarelo']);
-        $font_ui->addItems(['Inter' => 'Inter', 'Roboto' => 'Roboto', 'DM Sans' => 'DM Sans']);
         
         $has_box_shadow->addItems(['1' => 'Sim', '0' => 'Não']);
         $has_box_shadow->setLayout('horizontal');
         $has_box_shadow->setValue('1');
         
         $border_radius_px->setRange(0, 24, 1);
-        $hover_effect->addItems([
-            'default' => 'Padrão (Recomendado)',
-            'scale'   => 'Ampliar',
-            'elevate' => 'Elevar',
-            'glow'    => 'Brilho (Glow)',
-            'none'    => 'Nenhum'
-        ]);
         
-        $logo_container = new THBox;
-        $logo_container->add($url_logo);
+        $font_ui->addItems(array_column($all_fonts, 'label', 'name'));
+        $hover_effect->addItems(array_column($all_hovers, 'label', 'name'));
 
-        // --- Adiciona campos ao formulário ---
         $this->form->addFields([$id, $theme_id]);
         $this->form->addFields([new TLabel('Nome da Loja', '#ff0000')], [$nome_loja]);
-        $this->form->addFields([new TLabel('Logo')], [$logo_container]);
+        $this->form->addFields([new TLabel('Logo')], [$url_logo]);
         $this->form->addFields([new TLabel('Modo de Aparência')], [$background_mode]);
         $this->form->addFields([new TLabel('Cor Principal')], [$primary_color]);
         $this->form->addFields([new TLabel('Cor Secundária')], [$secondary_color]);
@@ -89,10 +101,10 @@ class StoreSettingsForm extends TPage
 
         $this->form->addAction('Salvar Alterações', new TAction([$this, 'onSave']), 'fa:save green');
         
+        // --- 4. Monta o layout da página ---
         $form_panel = TPanelGroup::pack('Edite as Configurações', $this->form);
         $hbox->add($form_panel)->style = 'width: 50%; padding-right: 10px;';
         
-        // --- Painel de Pré-visualização ---
         $preview = new TElement('div');
         $preview->id = 'store-preview';
         $preview->style = 'padding: 20px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;';
@@ -117,24 +129,89 @@ class StoreSettingsForm extends TPage
         parent::add($hbox);
         $this->onEdit($param);
 
+        $this->injectDynamicAssets();
+    }
+
+    private function injectDynamicAssets()
+    {
+        try {
+            TTransaction::open('permission');
+            $all_colors = CustomColor::getObjects();
+            $all_fonts = CustomFont::getObjects();
+            $all_hovers = CustomHoverEffect::getObjects();
+            TTransaction::close();
+        } catch (Exception $e) {
+            new TMessage('error', 'Falha ao carregar dados de personalização: ' . $e->getMessage());
+            return;
+        }
+
+        // Carrega as URLs das fontes para o navegador
+        foreach ($all_fonts as $font) {
+            TPage::include_css($font->import_url);
+        }
+
+        // Injeta o CSS customizado dos efeitos de hover
         $style = new TElement('style');
-        $style->add("
-            .hover-effect-default-card:hover { transform: scale(1.02); }
-            .hover-effect-default-button:hover { filter: brightness(0.9); }
-            .hover-effect-scale:hover { transform: scale(1.02); }
-            .hover-effect-elevate:hover { transform: translateY(-4px); } /* ADICIONADO */
-            #preview-card.hover-effect-glow:hover { box-shadow: 0 0 20px 0 var(--shadow-color, rgba(0,0,0,0.2)) !important; }
-            /* Transição suave para todos os elementos */
-            #preview-card, #preview-button-primary, #preview-button-secondary { transition: all 0.2s ease-out; }
-        ");
+        foreach ($all_hovers as $hover) {
+            $style->add($hover->css_code . "\n");
+        }
+        // Adiciona a transição padrão para suavidade
+        $style->add("#preview-card, #preview-button-primary, #preview-button-secondary { transition: all 0.2s ease-out; }");
         parent::add($style);
+
+        // Prepara os mapas de dados para o JavaScript
+        $allColorsMapJS = [];
+        foreach ($all_colors as $color) {
+            $allColorsMapJS[$color->name] = ['label' => $color->label, 'type' => $color->type, 'light' => $color->hex_light, 'dark' => $color->hex_dark];
+        }
         
         $script = new TElement('script');
         $script->type = 'text/javascript';
+        $script->add("var allColorsMap = " . json_encode($allColorsMapJS) . ";");
+        
+        // Adiciona a lógica completa de filtragem de cores e atualização do preview
         $script->add("
+            function updateColorOptions() {
+                var is_dark = $('input[name=background_mode]:checked').val() === 'dark';
+                var currentTheme = is_dark ? 'dark' : 'light';
+                var selectedPrimary = (typeof savedPrimaryColor !== 'undefined') ? savedPrimaryColor : $('select[name=primary_color]').val();
+                var selectedSecondary = (typeof savedSecondaryColor !== 'undefined') ? savedSecondaryColor : $('select[name=secondary_color]').val();
+
+                $('select[name=primary_color], select[name=secondary_color]').empty();
+
+                for (const name in allColorsMap) {
+                    const color = allColorsMap[name];
+                    if (color[currentTheme]) {
+                        var option = new Option(color.label, name);
+                        if (color.type === 'primary') {
+                            $('select[name=primary_color]').append(option);
+                        } else if (color.type === 'secondary') {
+                            $('select[name=secondary_color]').append(option);
+                        }
+                    }
+                }
+                
+                if ($('select[name=primary_color] option[value=\"' + selectedPrimary + '\"]').length > 0) {
+                    $('select[name=primary_color]').val(selectedPrimary);
+                } else {
+                    // Seleciona a primeira opção para garantir que não fique nulo
+                    $('select[name=primary_color] option:first').prop('selected', true);
+                }
+
+                if ($('select[name=secondary_color] option[value=\"' + selectedSecondary + '\"]').length > 0) {
+                    $('select[name=secondary_color]').val(selectedSecondary);
+                } else {
+                    // Seleciona a primeira opção para garantir que não fique nulo
+                    $('select[name=secondary_color] option:first').prop('selected', true);
+                }
+                $('select[name=primary_color], select[name=secondary_color]').trigger('change');
+            }
+
             function updatePreview() {
                 var is_dark = $('input[name=background_mode]:checked').val() === 'dark';
+                var currentTheme = is_dark ? 'dark' : 'light';
                 
+                // Estilos base
                 $('#store-preview').css('background-color', is_dark ? '#252527' : '#f8f9fa');
                 $('#store-preview').css('border-color', is_dark ? '#a1a1aa' : '#dee2e6');
                 $('#preview-card').css('background-color', is_dark ? '#3C3B3E' : '#ffffff');
@@ -142,59 +219,70 @@ class StoreSettingsForm extends TPage
                 $('#preview-card').css('border', is_dark ? 'none' : '1px solid #dee2e6');
                 $('#preview-logo').css('background-color', is_dark ? '#504f52' : '#f0f0f0');
                 
-                var color_map_primary = {'default': '#3498db', 'greenlime': '#2ecc71', 'purple': '#8e44ad', 'orange': '#e67e22'};
+                // Cores
                 var primary_color_name = $('select[name=primary_color]').val();
-                $('#preview-button-primary').css('background-color', color_map_primary[primary_color_name]);
-                
+                if (primary_color_name && allColorsMap[primary_color_name]) {
+                    var final_primary_color = allColorsMap[primary_color_name][currentTheme];
+                    $('#preview-button-primary').css('background-color', final_primary_color);
+                }
+
                 var secondary_color_name = $('select[name=secondary_color]').val();
-                var color_map_secondary = {'default': '#555', 'red': '#e74c3c', 'yellow': '#f1c40f'};
-                var final_secondary_color = (secondary_color_name === 'default') ? (is_dark ? '#f5f5f5' : color_map_secondary['default']) : color_map_secondary[secondary_color_name];
-                $('#preview-button-secondary').css('border-color', final_secondary_color);
-                $('#preview-button-secondary > i').css('color', final_secondary_color);
+                if (secondary_color_name && allColorsMap[secondary_color_name]) {
+                    var final_secondary_color = allColorsMap[secondary_color_name][currentTheme];
+                    $('#preview-button-secondary').css('border-color', final_secondary_color);
+                    $('#preview-button-secondary > i').css('color', final_secondary_color);
+                }
                 
+                // Fonte
                 var font_name = $('select[name=font_ui]').val();
                 $('#preview-card').css('font-family', font_name + ', sans-serif');
                 
+                // --- CÓDIGO COMPLETADO ---
+                
+                // Arredondamento
                 var border_radius = $('input[name=border_radius_px]').val() + 'px';
                 $('#preview-card, #preview-button-primary, #preview-button-secondary').css('border-radius', border_radius);
 
+                // Sombra
                 var has_shadow = $('input[name=has_box_shadow]:checked').val() == '1';
-                var hover_effect = $('select[name=hover_effect]').val();
-                var shadow_color = 'rgba(0, 0, 0, 0.4)';
                 var final_shadow = 'none';
-
                 if (has_shadow) {
-                    final_shadow = '0 4px 12px 0 ' + shadow_color;
+                    var shadow_color = is_dark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0,0,0,0.15)';
+                    final_shadow = '0 4px 16px 0 ' + shadow_color;
                 }
                 $('#preview-card').css('box-shadow', final_shadow);
 
-                $('#preview-card, #preview-button-primary, #preview-button-secondary').removeClass('hover-effect-scale hover-effect-elevate hover-effect-default-card hover-effect-default-button');
-                $('#preview-card').removeClass('hover-effect-glow');
-
-                if (hover_effect === 'default') {
-                    $('#preview-card').addClass('hover-effect-default-card');
-                    $('#preview-button-primary, #preview-button-secondary').addClass('hover-effect-default-button');
+                // Efeito Hover
+                var hover_effect = $('select[name=hover_effect]').val();
+                $('#preview-card, #preview-button-primary, #preview-button-secondary').removeClass (function (index, className) {
+                    return (className.match (/(^|\\s)hover-effect-\\S+/g) || []).join(' ');
+                });
+                
+                if (hover_effect !== 'none') {
+                    if (hover_effect === 'default') {
+                        $('#preview-card').addClass('hover-effect-default-card');
+                        $('#preview-button-primary, #preview-button-secondary').addClass('hover-effect-default-button');
+                    }
+                    else if (hover_effect === 'glow') {
+                        var glow_color = is_dark ? 'rgba(255, 255, 255, 0.1)' : final_primary_color;
+                        document.documentElement.style.setProperty('--shadow-color', glow_color);
+                        $('#preview-card').addClass('hover-effect-glow');
+                    }
+                    else {
+                        $('#preview-card, #preview-button-primary, #preview-button-secondary').addClass('hover-effect-' + hover_effect);
+                    }
                 }
-                else if (hover_effect === 'scale') {
-                    $('#preview-card, #preview-button-primary, #preview-button-secondary').addClass('hover-effect-scale');
-                }
-                else if (hover_effect === 'elevate') { // ADICIONADO
-                    $('#preview-card, #preview-button-primary, #preview-button-secondary').addClass('hover-effect-elevate');
-                }
-                else if (hover_effect === 'glow') {
-                    var primary_color_name = $('select[name=primary_color]').val();
-                    var color_map_primary = {'default': '#3498db', 'greenlime': '#2ecc71', 'purple': '#8e44ad', 'orange': '#e67e22'};
-                    var glow_color = is_dark ? 'rgba(255, 255, 255, 0.1)' : color_map_primary[primary_color_name];
-                    document.documentElement.style.setProperty('--shadow-color', glow_color);
-                    $('#preview-card').addClass('hover-effect-glow');
-                }
+                // --- FIM DO CÓDIGO COMPLETADO ---
             }
             
-            $('#form_store_settings input, #form_store_settings select').on('change input', updatePreview);
-            $(document).ready(function(){ setTimeout(updatePreview, 150); });
-
+            // Listeners
+            $('input[name=background_mode]').on('change', function() {
+                updateColorOptions();
+                updatePreview(); // Chama o updatePreview também para atualizar a sombra
+            });
+            $('form[name=form_store_settings] input, form[name=form_store_settings] select').on('change input', updatePreview);
+            $(document).ready(function(){ setTimeout(updateColorOptions, 150); });
         ");
-
         parent::add($script);
     }
 
@@ -217,6 +305,13 @@ class StoreSettingsForm extends TPage
                         $data->id = $tenant->id;
                         $data->theme_id = $theme->id;
                         $this->form->setData($data);
+
+                        $script = new TElement('script');
+                        $script->add("
+                            var savedPrimaryColor = '{$theme->primary_color}';
+                            var savedSecondaryColor = '{$theme->secondary_color}';
+                        ");
+                        parent::add($script);
 
                         if (!empty($tenant->url_logo) && file_exists($tenant->url_logo)) {
                             
@@ -256,10 +351,11 @@ class StoreSettingsForm extends TPage
 
             $tenant = new Tenant($data->id);
             
-           $old_logo_path = $tenant->url_logo;
+            $old_logo_path = $tenant->url_logo;
             
-            if (isset($param['url_logo']) && !empty($param['url_logo']))
+            if (isset($param['url_logo']) && !empty($param['url_logo'] && substr(trim($param['url_logo']), 0, 12) !== 'files/logos/'))
             {
+            
                 $source_file = 'tmp/' . $param['url_logo'];
 
                 // Bloco de depuração (mantido como você pediu)

@@ -64,8 +64,8 @@ class SystemProfileView extends TPage
                     $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
                     $slug = trim($slug, '-');
                     
-                    $base_domain = 'apex-store.com';
-                    $url = "https://{$slug}.{$base_domain}";
+                    $base_domain = 'vibevault.com:4200';
+                    $url = "http://{$slug}.{$base_domain}";
 
                     $link = new TElement('a');
                     $link->href = $url;

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { Title } from '@angular/platform-browser';
+import { environment } from '../../environments/environment';
 
 // Interface (no changes needed here)
 export interface TenantTheme {
@@ -21,12 +23,12 @@ export interface TenantTheme {
 export class TenantService {
   private tenantThemeSubject = new BehaviorSubject<TenantTheme | null>(null);
   public tenantTheme$ = this.tenantThemeSubject.asObservable();
-  public readonly apiBaseUrl = 'http://apex.com:3000';
+  public readonly apiBaseUrl = environment.tenantsApi;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private titleService: Title) {}
 
   loadTenant(): Observable<TenantTheme> {
-    const apiUrl = `${this.apiBaseUrl}/api/tenant/details`;
+    const apiUrl = `${this.apiBaseUrl}/details`;
 
     return this.http.get<TenantTheme>(apiUrl).pipe(
       tap(theme => {
@@ -39,7 +41,13 @@ export class TenantService {
   private applyTheme(theme: TenantTheme): void {
     const root = document.documentElement;
 
-    // CORRIGIDO: Adicionada a tipagem de 'index signature' [key: string]: string
+    this.titleService.setTitle(theme.nome_loja);
+
+    const faviconLink = document.getElementById('favicon') as HTMLLinkElement;
+    if (faviconLink) {
+      faviconLink.href = `${environment.imageDB}/${theme.url_logo}`;
+    }
+
     const colorMapPrimary: {[key: string]: string} = {'default': '#3498db', 'greenlime': '#2ecc71', 'purple': '#8e44ad', 'orange': '#e67e22'};
     const colorMapSecondary: {[key: string]: string} = {'default': '#555', 'red': '#e74c3c', 'yellow': '#f1c40f'};
 

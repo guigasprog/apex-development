@@ -18,7 +18,7 @@ const corsOptions = {
     try {
         const hostname = new URL(origin).hostname;
 
-        if (hostname.endsWith('.apex.com')) {
+        if (hostname.endsWith('.vibevault.com')) {
             callback(null, true);
         } else {
             callback(new Error('Acesso negado pela política de CORS')); // Barra a entrada

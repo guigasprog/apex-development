@@ -1,0 +1,14 @@
+{
+  "name": "vibevault-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:api": "cd api && npm run dev",
+    "start:storefront": "cd client && ng serve --host 0.0.0.0 --port 4200 --disable-host-check",
+    "start:control": "php -S vibevault.com:80 -t control/",
+    "dev": "concurrently \"npm:start:api\" \"npm:start:storefront\" \"npm:start:control\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

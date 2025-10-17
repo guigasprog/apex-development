@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  imageBaseUrl: 'http://172.20.0.131/vibe-vault/stocktrack/',
+  imageDB: 'http://vibevault.com/',
 
-  tenantsApi: 'http://apex-store.com:3000/api/tenant',
+  tenantsApi: 'http://vibevault.com:3000/api/tenant',
 
   productsApi: 'http://apex-store.com:3000/api/products',
 

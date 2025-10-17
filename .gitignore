@@ -1,22 +1,22 @@
 
 /node_modules/
-/server/node_modules/
+/api/node_modules/
 
 /vendor/
-/apex/vendor/
+/control/vendor/
 
 npm-debug.log*
 yarn-error.log
 yarn-debug.log
 /tmp/
-/apex/tmp/
-/apex/app/output/
+/control/tmp/
+/control/app/output/
 
 .env
 .env.local
 .env.*.local
-/apex/app/database/*.db
-/apex/app/config/tenant_*.ini
+/control/app/database/*.db
+/control/app/config/tenant_*.ini
 
 .vscode/
 .idea/
@@ -25,4 +25,4 @@ yarn-debug.log
 Thumbs.db
 
 /files/
-/apex/files/
+/control/files/
