@@ -1,0 +1,14 @@
+
+<main class="store-content">
+  <h2 class="store-content__title">Nossos Produtos</h2>
+
+  <div *ngIf="isLoadingProducts" class="loading-spinner">
+    Carregando produtos...
+  </div>
+
+  <div *ngIf="productLoadError" class="error-message">
+    {{ productLoadError }}
+  </div>
+
+  <app-product-list *ngIf="!isLoadingProducts && !productLoadError" [products]="products"></app-product-list>
+</main>

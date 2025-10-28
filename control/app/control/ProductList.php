@@ -15,13 +15,11 @@ use Adianti\Wrapper\BootstrapFormBuilder;
 use Adianti\Registry\TSession;
 use Adianti\Widget\Base\TElement;
 
-// REMOVIDO: A linha "use Adianti\Util\AdiantiStringConversion;" foi apagada.
-
 class ProductList extends TStandardList
 {
     protected $form;
     protected $datagrid;
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -42,9 +40,9 @@ class ProductList extends TStandardList
         $this->datagrid = new TDataGrid;
         $this->datagrid->style = 'width: 100%';
         
-        $col_id    = new TDataGridColumn('id', 'ID', 'center', '10%');
-        $col_nome  = new TDataGridColumn('nome', 'Nome', 'left');
-        $col_tipo  = new TDataGridColumn('tipo', 'Tipo', 'center');
+        $col_id = new TDataGridColumn('id', 'ID', 'center', '10%');
+        $col_nome = new TDataGridColumn('nome', 'Nome', 'left');
+        $col_tipo = new TDataGridColumn('tipo', 'Tipo', 'center');
         $col_preco = new TDataGridColumn('preco', 'Preço', 'right');
         
         $col_preco->setTransformer(function($value) {
@@ -69,8 +67,6 @@ class ProductList extends TStandardList
             
             $badge = new TElement('span');
             $badge->class = "label label-{$class}";
-            
-            // CORRIGIDO: Usando a função nativa do PHP
             $badge->add(strtoupper($label));
             return $badge;
         });
@@ -81,7 +77,7 @@ class ProductList extends TStandardList
         $this->datagrid->addColumn($col_preco);
         
         $action_edit = new TDataGridAction(['ProductForm', 'onEdit'], ['id'=>'{id}']);
-        $action_del  = new TDataGridAction([$this, 'onDelete'], ['id'=>'{id}']);
+        $action_del = new TDataGridAction([$this, 'onDelete'], ['id'=>'{id}']);
         
         $this->datagrid->addAction($action_edit, 'Editar', 'fa:edit blue');
         $this->datagrid->addAction($action_del, 'Deletar', 'fa:trash-alt red');

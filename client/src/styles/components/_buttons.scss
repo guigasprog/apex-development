@@ -1,7 +1,8 @@
 // =================================================================
 // BOTÕES
 // =================================================================
-@use '../base/variables' as *;
+@use '../base/variables' as *; // Importa as variáveis SCSS
+@use '../base/mixins' as *;
 
 .button-group {
   display: flex;
@@ -11,22 +12,23 @@
 .btn {
   border: none;
   padding: 12px 15px;
-  border-radius: $border-radius;
+  border-radius: $border-radius; // Usa a variável SCSS
   cursor: pointer;
   font-weight: bold;
-  font-family: inherit;
+  font-family: inherit; // Herda a fonte base
   transition: all 0.2s ease-out;
 
   &--primary {
-    background-color: $primary-color;
-    color: white;
+    background-color: $primary-color; // Usa a variável SCSS
+    color: white; // Assume contraste bom com cores primárias
     flex-grow: 1;
   }
 
   &--secondary {
+    @include flex-center();
     background-color: transparent;
-    border: 1px solid $secondary-color;
-    color: $secondary-color;
+    border: 1px solid $secondary-color; // Usa a variável SCSS
+    color: $secondary-color; // Usa a variável SCSS
     width: 44px;
     height: 44px;
     padding: 0;

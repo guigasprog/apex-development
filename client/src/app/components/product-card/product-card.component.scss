@@ -1,0 +1,72 @@
+// src/styles/components/_product-card.scss
+@use '../../../styles/base/variables' as *;
+@use '../../../styles/base/mixins' as *;
+
+.product-card {
+  width: 100%;
+  height: 450px;
+  background-color: $surface-color-light;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  overflow: hidden;
+  display: flex; // <-- ADICIONADO: Torna o card um container flex
+  flex-direction: column; // <-- ADICIONADO: Organiza os itens (imagem, info) em coluna
+  transition: all 0.2s ease-out;
+  position: relative;
+
+  body.dark-theme & {
+    background-color: $surface-color-dark;
+  }
+
+  @include tablet-up {
+    max-width: 320px;
+  }
+
+  &__image {
+    width: 100%;
+    height: 250px; // Altura fixa para a imagem
+    object-fit: cover;
+    background-color: $surface-color-light;
+    flex-shrink: 0; // Impede que a imagem encolha
+    body.dark-theme & {
+      color: $surface-color-dark;
+    }
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    line-height: 1.45rem;
+    margin-bottom: 0.5rem;
+    height: calc(1.45rem*3);
+    overflow: hidden;
+  }
+
+  &__description {
+    font-size: 0.95rem;
+    color: $text-color-secondary-light;
+    line-height: 1.5;
+    flex-grow: 1;
+
+    body.dark-theme & {
+      color: $text-color-secondary-dark;
+    }
+  }
+
+  &__price {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: $primary-color; // Usa a cor primária do tema
+    margin-top: auto; // Empurra o preço e botões para baixo se a descrição for curta
+    padding-top: 1rem; // Espaço acima do preço
+    margin-bottom: 1rem; // Espaço entre preço e botões
+    position: absolute;
+    bottom: 3.7rem;
+  }
+
+  .buttons {
+    position: absolute;
+    bottom: 1.5rem;
+    width: 83.5%;
+  }
+}
+

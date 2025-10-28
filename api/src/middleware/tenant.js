@@ -1,42 +1,42 @@
-import db from '../database/connection.js';
+// src/middleware/tenant.js
+import { connectPermissionDb, closeDbConnection } from '../database/connection.js';
 
-// Middleware para identificar o tenant (loja) com base no subdomínio
 export async function identifyTenant(req, res, next) {
-    // A origem nos diz quem está fazendo a chamada (ex: http://loja-exemplo.apex-store.com)
     const origin = req.get('origin');
-    
-    if (!origin) {
-        return next(); // Se não houver origem, continua sem identificar
-    }
+    if (!origin) return next();
 
+    let permDb = null; // Guarda a conexão
     try {
-        // Extrai o host (loja-exemplo.apex-store.com)
         const host = new URL(origin).hostname;
         const slug = host.split('.')[0];
 
-        // Se o slug for 'www' ou o domínio principal, ignora
-        if (slug === 'www' || slug === 'apex-store') {
+        if (slug === 'www' || slug === 'api' || slug === 'vibevault') { // Ignora subdomínios não-tenant
             return next();
         }
 
-        // Faz a busca no banco de dados usando Promises para um código mais limpo
+        permDb = await connectPermissionDb(); // Conecta ao banco principal
+
         const tenant = await new Promise((resolve, reject) => {
-            const query = "SELECT * FROM tenants WHERE slug = ?";
-            db.get(query, [slug], (err, row) => {
+            const query = "SELECT id, nome_loja, slug, url_logo FROM tenants WHERE slug = ?";
+            permDb.get(query, [slug], (err, row) => {
                 if (err) reject(err);
                 resolve(row);
             });
         });
 
         if (tenant) {
-            // Anexa os dados do tenant à requisição para serem usados nas rotas
-            req.tenant = tenant;
+            req.tenant = tenant; // Anexa os dados do tenant
+        } else {
+            console.warn(`Tenant não encontrado para o slug: ${slug}`);
         }
 
-        next(); // Passa para a próxima etapa (a rota da API)
+        next();
 
     } catch (error) {
         console.error("Erro ao identificar o tenant:", error);
-        next(); // Continua mesmo se houver erro, para não travar a aplicação
+        next(error); // Passa o erro para o Express
+    } finally {
+        // Garante que a conexão com permission.db seja fechada
+        closeDbConnection(permDb, 'permission.db');
     }
 }

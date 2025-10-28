@@ -1,23 +1,47 @@
 // =================================================================
-// CABEÇALHO DA LOJA
+// CABEÇALHO DA LOJA (Store Header)
 // =================================================================
-@use '../base/variables' as *;
+@use '../base/variables' as *; // Importa as variáveis SCSS
 @use '../base/mixins' as *;
 
 .store-header {
-  @include flex-center();
+  @include flex-center(row); // Ajustado para linha no header
+  justify-content: space-between; // Espaça os elementos
   margin-bottom: 3rem;
-  text-align: center;
+  text-align: center; // Mantém o fallback para centralização
+  background-color: $surface-color-light; // Usa a variável SCSS
+  transition: background-color 0.3s, border-color 0.3s;
+
+  body.dark-theme & {
+    background-color: $surface-color-dark; // Usa a variável SCSS
+  }
+
+  &__branding a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+  }
 
   &__logo {
-    max-width: 180px;
-    max-height: 90px;
+    height: 40px;
+    max-width: 150px;
     object-fit: contain;
-    margin-bottom: 1rem;
+    margin-right: 0.5rem;
   }
 
   &__title {
-    font-size: 2.5rem;
-    color: $primary-color;
+    // Classe para o nome da loja se não houver logo
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: $primary-color; // Usa a variável SCSS
+  }
+
+  // --- Barra de Busca ---
+  &__search {
+    flex-grow: 1;
+    max-width: 500px;
+    position: relative;
   }
 }
+

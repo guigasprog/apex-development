@@ -4,7 +4,7 @@ export const environment = {
 
   tenantsApi: 'http://vibevault.com:3000/api/tenant',
 
-  productsApi: 'http://apex-store.com:3000/api/products',
+  productsApi: 'http://vibevault.com:3000/api/products',
 
   ordersApi: 'http://apex-store.com:3000/api/orders',
 

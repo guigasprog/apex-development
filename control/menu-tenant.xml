@@ -69,7 +69,21 @@
                     </menuitem>
                 </menu>
             </menuitem>
-            
+
+            <menuitem label="Relatórios">
+                <icon>fa:chart-bar fa-fw</icon>
+                <menu>
+                    <menuitem label="Interações">
+                        <icon>fa:search fa-fw</icon>
+                        <action>InteractionReport</action> 
+                    </menuitem>
+                    <menuitem label="Vendas por Status">
+                        <icon>fa:shopping-cart fa-fw</icon>
+                        <action>VendaReport</action> 
+                    </menuitem>
+                </menu>
+            </menuitem>
+
             <menuitem label='Configuração'>
                 <icon>fas:cogs fa-fw</icon>
                 <menu>

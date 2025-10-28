@@ -1,0 +1,60 @@
+<header class="store-header" *ngIf="theme$ | async as theme">
+
+  <div class="store-header__branding">
+    <a routerLink="/" title="Página Inicial"> <img *ngIf="theme.url_logo"
+        [src]="apiImage + '/' + theme.url_logo" [alt]="theme.nome_loja + ' Logo'" class="store-header__logo">
+      <span class="store-header__name">{{ theme.nome_loja }}</span>
+    </a>
+  </div>
+
+  <div class="store-header__search">
+    <form (ngSubmit)="onSearchSubmit()" class="search-form" autocomplete="off">
+      <input type="search" name="search" [(ngModel)]="searchTerm" placeholder="Buscar produtos..."
+        aria-label="Buscar produtos" (input)="onSearchInput()" (blur)="closeAutocomplete()"
+        class="search-form__input">
+        <button type="submit" class="search-form__button" aria-label="Buscar">
+        <i class="fas fa-search"></i>
+      </button>
+      <div class="autocomplete-results" *ngIf="showAutocomplete && autocompleteResults as results">
+        <ul *ngIf="results.length > 0">
+          <li *ngFor="let result of results" (mousedown)="selectResult(result)">
+            {{ result.name }}
+          </li>
+        </ul>
+      </div>
+    </form>
+  </div>
+
+  <div class="store-header__actions">
+
+    <div class="auth-actions">
+      <ng-container *ngIf="isLoggedIn$ | async; else loggedOutActions">
+        <button class="btn btn--icon btn--text" (click)="goToProfile()" aria-label="Meu Perfil">
+          <i class="fas fa-user"></i>
+          <span>Perfil</span>
+        </button>
+        <button class="btn btn--icon btn--text" (click)="logout()" aria-label="Sair">
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Sair</span>
+        </button>
+      </ng-container>
+      <ng-template #loggedOutActions>
+        <button class="btn btn--icon btn--text" (click)="login()" aria-label="Entrar">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Entrar</span>
+        </button>
+        <span class="action-separator">|</span>
+        <button class="btn btn--icon btn--text" (click)="register()" aria-label="Registrar">
+          <i class="fas fa-user-plus"></i>
+          <span>Registrar</span>
+        </button>
+      </ng-template>
+    </div>
+
+    <button class="btn btn--icon cart-button" (click)="goToCart()" aria-label="Carrinho de Compras">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-badge" *ngIf="(cartItemCount$ | async) as count">{{ count > 9 ? '9+' : count }}</span>
+    </button>
+  </div>
+
+</header>

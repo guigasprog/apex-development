@@ -1,0 +1,15 @@
+<div class="search-page-container">
+  <h1 *ngIf="searchTerm$ | async as term">
+    Resultados para "{{ term }}"
+  </h1>
+  <h1 *ngIf="!(searchTerm$ | async)">
+    Digite um termo para buscar
+  </h1>
+
+  <div *ngIf="isLoading" class="loading-spinner">Buscando...</div>
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <app-product-list *ngIf="!isLoading && !error" [products]="(searchResults$ | async) ?? []">
+  </app-product-list>
+
+</div>

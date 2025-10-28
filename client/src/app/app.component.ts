@@ -1,37 +1,43 @@
-import { environment } from './../environments/environment';
+
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // <-- 1. IMPORT CommonModule
+import { CommonModule } from '@angular/common';
 import { TenantService } from './services/tenant.service';
-import { Observable } from 'rxjs';
-import { TenantTheme } from './services/tenant.service';
+import { RouterOutlet } from '@angular/router';
+import { StoreHeaderComponent } from './components/store-header/store-header.component';
 
 @Component({
   selector: 'app-root',
-  standalone: true, // Modern Angular uses standalone components
-  imports: [CommonModule], // <-- 2. ADD imports array with CommonModule
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  standalone: true,
+  imports: [ CommonModule, StoreHeaderComponent, RouterOutlet ],
+  template: `
+    <app-store-header></app-store-header>
+    <router-outlet *ngIf="themeLoaded" />
+    <div *ngIf="!themeLoaded && !loadError" class="loading-spinner">Carregando sua loja...</div>
+    <div *ngIf="loadError" class="error-message">
+      <h1>Erro ao Carregar a Loja</h1>
+      <p>{{ errorMessage }}</p>
+    </div>
+  `,
 })
 export class AppComponent implements OnInit {
 
-  theme$: Observable<TenantTheme | null>;
-  apiBaseUrl: string;
+  themeLoaded = false;
+  loadError = false;
+  errorMessage = '';
 
-  constructor(private tenantService: TenantService) {
-    this.theme$ = this.tenantService.tenantTheme$;
-    this.apiBaseUrl = environment.imageDB;
-  }
+  constructor(private tenantService: TenantService) {}
 
   ngOnInit(): void {
     this.tenantService.loadTenant().subscribe({
       next: (theme) => {
         if (theme) {
-          console.log(`Tema da loja "${theme.nome_loja}" carregado com sucesso!`);
+          this.themeLoaded = true;
+        } else {
+          this.loadError = true; this.errorMessage = 'Dados do tema não encontrados.';
         }
       },
       error: (err) => {
-        console.error('Falha ao carregar o tema:', err);
-        document.body.innerHTML = `<h1>Erro: Loja não encontrada</h1><p>${err.error?.error || err.message}</p>`;
+        this.loadError = true; this.errorMessage = err.error?.error || err.message || 'API indisponível.';
       }
     });
   }

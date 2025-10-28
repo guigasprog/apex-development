@@ -1,5 +1,5 @@
 // =================================================================
-// ARQUIVO PRINCIPAL DE ESTILOS
+// ARQUIVO PRINCIPAL DE ESTILOS - styles.scss
 // =================================================================
 
 // 1. Base (Variáveis, Mixins, Estilos Globais)
@@ -14,31 +14,19 @@
 @use 'styles/components/buttons';
 @use 'styles/components/product-card';
 
-// 4. Efeitos de Hover (Classes dinâmicas)
-// Essas classes são aplicadas via [ngClass] no Angular
-.hover-effect-default-card:hover,
-.hover-effect-scale:hover {
-  transform: scale(1.02);
-}
 
-.hover-effect-elevate:hover {
-  transform: translateY(-5px);
-}
 
-.hover-effect-default-button:hover {
-  filter: brightness(0.9);
-}
-
-#preview-card.hover-effect-glow:hover {
-  box-shadow: 0 0 20px 0 var(--shadow-color, rgba(0, 0, 0, 0.2)) !important;
-}
-
-// Estilos de Loading
 .loading-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 80vh;
+  height: 80vh; // Ocupa a maior parte da tela
   font-size: 1.5rem;
-  color: #888;
+  color: #888; // Cor neutra
+  text-align: center;
+}
+
+.product-card,
+.btn {
+  transition: all 0.2s ease-out;
 }
