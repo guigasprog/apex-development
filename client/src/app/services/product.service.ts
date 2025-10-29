@@ -1,12 +1,23 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, switchMap, timer } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Product } from '../models/product.model'; // Importa a interface
 import { environment } from '../../environments/environment'; // Para a URL da API
 
-interface AutocompleteItem {
+export interface ProductInteraction {
+  tipo: 'search' | 'view';
+  texto_busca?: string | null;
+  produto_id?: number | null;
+}
+
+export interface AutocompleteItem {
   id: number;
   name: string;
+}
+
+export interface ProductDetail extends Product {
+  images: { image_url: string, descricao: string }[];
+  specifications: { nome: string, valor: string }[];
 }
 
 @Injectable({
@@ -28,12 +39,17 @@ export class ProductService {
     return this.http.get<Product[]>(url);
   }
 
+  /**
+   * Busca os detalhes completos de um único produto.
+   */
+  getProductById(id: number): Observable<ProductDetail> {
+    return this.http.get<ProductDetail>(`${this.apiUrl}/${id}`);
+  }
 
   getAutocomplete(term: string): Observable<AutocompleteItem[]> {
-    const url = `${this.apiUrl}/autocomplete`;
     // Usa HttpParams para adicionar o parâmetro ?term=... de forma segura
     const params = new HttpParams().set('term', term);
-    return this.http.get<AutocompleteItem[]>(url, { params });
+    return this.http.get<AutocompleteItem[]>(`${this.apiUrl}/autocomplete`, { params });
   }
 
   /**
@@ -44,6 +60,14 @@ export class ProductService {
     const url = `${this.apiUrl}/search`;
     const params = new HttpParams().set('q', query);
     return this.http.get<Product[]>(url, { params });
+  }
+
+  /**
+   * Registra uma interação de usuário (busca ou view) no backend.
+   * Esta é uma chamada "fire-and-forget", não esperamos dados de volta.
+   */
+  logInteraction(interactionData: ProductInteraction): Observable<any> {
+    return this.http.post(`${this.apiUrl}/interactions`, interactionData);
   }
 
   // Futuramente: adicionar métodos como getProductById(id), etc.

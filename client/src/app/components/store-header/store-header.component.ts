@@ -77,8 +77,10 @@ export class StoreHeaderComponent implements OnInit {
   // --- Métodos da Busca ---
   onSearchSubmit(): void {
     this.showAutocomplete = false; // Esconde autocomplete ao submeter
-    if (this.searchTerm.trim()) {
+    if (this.searchTerm.trim() !== '') {
       this.router.navigate(['/search'], { queryParams: { q: this.searchTerm } });
+    } else {
+      this.router.navigate(['/']); // Navega para a loja se vazio
     }
   }
 

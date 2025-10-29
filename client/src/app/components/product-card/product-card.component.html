@@ -1,5 +1,5 @@
 <ng-container *ngIf="(theme$ | async) as theme">
-  <div class="product-card" [ngClass]="getHoverClass(theme)" *ngIf="product">
+  <div class="product-card" [ngClass]="getHoverClass(theme)" *ngIf="product" (click)="viewProductDetails()">
 
     <img class="product-card__image"
       [src]="product.main_image_url ? (apiImage + '/' + product.main_image_url) : 'https://api.iconify.design/ph:image-square-duotone.svg?color=%23cccccc'"
@@ -12,7 +12,7 @@
       <div class="buttons">
         <div class="button-group">
           <button class="btn btn--primary" [ngClass]="getButtonHoverClass(theme)">Comprar Agora</button>
-          <button class="btn btn--secondary" [ngClass]="getButtonHoverClass(theme)">
+          <button class="btn btn--secondary" (click)="toggleFavorite($event)" [ngClass]="getButtonHoverClass(theme)" [class.is-favorite]="isFavorite">
             <i class="fa-solid fa-heart"></i>
           </button>
         </div>

@@ -25,7 +25,33 @@ $font-family-base: var(--font-family, 'Inter', sans-serif);
 
 // --- Layout ---
 $border-radius: var(--border-radius, 8px);
-$card-shadow: var(--card-shadow, 0 4px 12px 0 rgba(0, 0, 0, 0.4));
+$card-shadow-fallback: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+$header-shadow-fallback: 0 2px 5px 0 rgba(0, 0, 0, 0.15);
 
-// --- Breakpoints (Mobile-First) ---
+$card-shadow: var(--card-shadow, $card-shadow-fallback);
+$header-shadow: var(--header-shadow, $header-shadow-fallback);
+
+// Em seu arquivo /base/_variables.scss (Exemplos de novas variáveis)
+
+// ... suas variáveis existentes ($primary-color, $card-shadow, etc.) ...
+
+// Variáveis de Layout
+$container-max-width: 1400px;
 $breakpoint-tablet: 768px;
+$breakpoint-mobile: 768px;
+
+// Variáveis do Cabeçalho
+$header-padding-y: 0.8rem;
+$header-padding-x: 1.5rem;
+$header-logo-height: 40px;
+$header-search-max-width: 500px;
+$header-search-height: 44px;
+
+// Z-Index
+$z-index-autocomplete: 1000;
+$z-index-header: 900; // (Bom ter um z-index para o header também)
+
+// Transições
+$transition-duration-default: 0.3s;
+$transition-duration-fast: 0.15s;
+$transition-duration-micro: 0.2s;

@@ -1,0 +1,46 @@
+<div class="product-detail-page" *ngIf="product$ | async as product; else loadingOrError">
+
+  <div class="product-container">
+
+    <app-product-gallery class="product-gallery" [images]="product.images" [apiImagePrefix]="apiImage" />
+
+    <div class="product-info">
+      <h1 class="product-info__name">{{ product.name }}</h1>
+      <p class="product-info__details">{{ product.description || 'Nenhuma descrição disponível.' }}</p>
+      <p class="product-info__price">{{ product.price | currency:'BRL' }}</p>
+
+      <div class="product-info__actions">
+        <button class="btn btn--primary" (click)="openBuyDialog()" [ngClass]="getHoverClass(theme$ | async)">
+          Comprar
+        </button>
+        <button class="btn btn--secondary" (click)="toggleFavorite()" [ngClass]="getHoverClass(theme$ | async)" [class.is-favorite]="isFavorite"
+          [title]="isFavorite ? 'Remover dos Favoritos' : 'Adicionar aos Favoritos'">
+          <i class="fas fa-heart"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="product-specifications" *ngIf="product.specifications && product.specifications.length > 0">
+    <h2>Especificações Técnicas</h2>
+    <ul>
+      <li *ngFor="let spec of product.specifications">
+        <strong>{{ spec.nome }}:</strong> {{ spec.valor }}
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<app-buy-dialog *ngIf="showBuyDialog" (decision)="handleBuyDecision($event)"></app-buy-dialog>
+
+<ng-template #loadingOrError>
+  <div *ngIf="isLoading" class="loading-spinner">
+    Carregando produto...
+  </div>
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+    <a routerLink="/">Voltar para a loja</a>
+  </div>
+</ng-template>

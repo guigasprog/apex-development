@@ -1,0 +1,74 @@
+// =================================================================
+// PARCIAL: Ações do Header
+// =================================================================
+
+// Aninhado dentro de .store-header
+&__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn--icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.btn--text span {
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  // Media query co-localizada: esconde o texto em telas pequenas
+  @media (max-width: $breakpoint-mobile) {
+    display: none;
+  }
+}
+
+.action-separator {
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 1.2rem;
+
+  body.dark-theme & {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  // Media query co-localizada: esconde o separador em telas pequenas
+  @media (max-width: $breakpoint-mobile) {
+    display: none;
+  }
+}
+
+.cart-button {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: $secondary-color;
+  color: white;
+  border-radius: 50%;
+  padding: 0.1em 0.4em;
+  font-size: 0.75rem;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+}

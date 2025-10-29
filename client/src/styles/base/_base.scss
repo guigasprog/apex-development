@@ -30,3 +30,61 @@ h4,
 p {
   margin: 0;
 }
+
+input {
+  font-family: $font-family-base; // <-- Aplica a fonte ao texto digitado
+
+  // --- Estilos do Placeholder ---
+  &::placeholder {
+    font-family: $font-family-base;
+    color: $text-color-secondary-light;
+    opacity: 1;
+  }
+  body.dark-theme &::placeholder {
+    color: $text-color-secondary-dark;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 12px; // Largura da barra
+  height: 12px; // Altura (para barras horizontais)
+  background-color: $surface-color-light; // Fundo da barra (track)
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: $bg-color-light; // A barra (thumb)
+  border-radius: 10px; // Cantos arredondados
+  border: 3px solid $surface-color-light; // Cria uma "borda" usando a cor do fundo
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: $bg-color-light; // Escurece um pouco no hover
+}
+
+// --- Tema Escuro para a Barra de Rolagem ---
+body.dark-theme {
+  &::-webkit-scrollbar {
+    background-color: $surface-color-dark;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $bg-color-dark;
+    border-color: $surface-color-dark;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: $bg-color-dark;
+  }
+  ::-webkit-scrollbar {
+    background-color: $surface-color-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: $bg-color-dark;
+    border-color: $surface-color-dark;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: $bg-color-dark;
+  }
+}

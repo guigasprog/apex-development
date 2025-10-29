@@ -1,0 +1,22 @@
+<div class="gallery-container" *ngIf="images.length > 0; else noImages">
+
+  <div class="gallery-main-image-wrapper" [class.is-zooming]="isZooming" (click)="toggleZoom()"
+    (mousemove)="onMouseMove($event)" (mouseleave)="toggleZoomLeave()"> <img class="main-image" [src]="activeImageUrl" [alt]="activeImageAlt">
+
+    <img class="zoomed-image" [src]="activeImageUrl" [alt]="activeImageAlt" [style.transform-origin]="zoomOrigin">
+  </div>
+
+  <ul class="gallery-thumbnails">
+    <li *ngFor="let img of images; let i = index" class="thumbnail-item" [class.active]="i === activeImageIndex"
+      (click)="selectImage(i)" tabindex="0" (keydown.enter)="selectImage(i)">
+
+      <img [src]="apiImagePrefix + img.image_url" [alt]="img.descricao || 'Thumbnail ' + (i+1)">
+    </li>
+  </ul>
+</div>
+
+<ng-template #noImages>
+  <div class="gallery-main-image-wrapper">
+    <img class="main-image" [src]="activeImageUrl" alt="Imagem não disponível">
+  </div>
+</ng-template>

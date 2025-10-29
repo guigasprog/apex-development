@@ -1,0 +1,204 @@
+@use '../../../styles/base/variables' as *;
+@use '../../../styles/base/mixins' as *;
+
+// --- Contêiner Principal da Página ---
+.product-detail-page {
+  max-width: 1200px;
+  margin: 2.5rem auto; // Mais espaço no topo/fundo
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+// --- Layout Principal (Grid Assimétrico) ---
+.product-container {
+  display: grid;
+  // Damos mais espaço para a galeria (5) do que para info (4)
+  grid-template-columns: 5fr 4fr;
+  gap: 3rem; // Aumenta o espaço entre as colunas
+  align-items: start;
+  margin-bottom: 3rem;
+}
+
+// --- Galeria de Imagens (Esquerda) ---
+.product-gallery {
+  width: 100%;
+  position: sticky;
+  top: 2rem;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  height: 35rem;
+
+  &__name {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: $text-color-light;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+
+    :host-context(body.dark-theme) & {
+      color: $text-color-dark;
+    }
+  }
+
+  &__details {
+    max-width: 100%;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    min-height: 50px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  &__price {
+    font-size: 2.2rem;
+    font-weight: 500;
+    color: $primary-color;
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-shrink: 0;
+  }
+}
+
+// --- Seções de Conteúdo (Cards) ---
+.product-description,
+.product-specifications {
+  padding: 2rem; // Mais padding interno
+  background-color: $surface-color-light;
+  border-radius: $border-radius;
+  box-shadow: $header-shadow;
+  margin-top: 2.5rem; // Separado do bloco de compra
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: $text-color-light;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid $bg-color-light;
+  }
+
+  p,
+  li {
+    font-size: 1rem;
+    line-height: 1.7; // Mais espaçamento entre linhas (legibilidade)
+    color: $text-color-secondary-light;
+  }
+
+  :host-context(body.dark-theme) & {
+    background-color: $surface-color-dark;
+    box-shadow: $card-shadow;
+
+    h2 {
+      color: $text-color-dark;
+      border-bottom-color: $bg-color-dark;
+    }
+
+    p,
+    li {
+      color: $text-color-secondary-dark;
+    }
+  }
+}
+
+// Lista de Especificações
+.product-specifications {
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid $bg-color-light;
+
+    strong {
+      color: $text-color-light;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+
+    // --- Tema Escuro ---
+    :host-context(body.dark-theme) & {
+      border-bottom-color: $bg-color-dark;
+
+      strong {
+        color: $text-color-dark;
+      }
+    }
+  }
+
+  li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+
+// --- Estados de Loading e Erro (Mantido) ---
+.loading-spinner,
+.error-message {
+  @include flex-center;
+  flex-direction: column;
+  min-height: 400px;
+  text-align: center;
+  font-size: 1.2rem;
+  color: $text-color-secondary-light;
+
+  :host-context(body.dark-theme) & {
+    color: $text-color-secondary-dark;
+  }
+}
+
+.error-message {
+  color: $secondary-color;
+
+  a {
+    color: $primary-color;
+    text-decoration: underline;
+    margin-top: 1rem;
+  }
+}
+
+// --- Layout Responsivo (Mobile) ---
+// --- Layout Responsivo (Mobile) ---
+@media (max-width: $breakpoint-mobile) {
+
+  // ...
+  .product-gallery {
+    position: static;
+    max-height: 400px;
+    height: auto; // Garante que a altura fixa seja removida
+  }
+
+  .product-info {
+    height: auto; // <-- ADICIONE ISSO
+    text-align: left;
+
+    &__name {
+      font-size: 1.8rem;
+    }
+
+    &__price {
+      font-size: 1.7rem;
+    }
+
+  }
+
+}

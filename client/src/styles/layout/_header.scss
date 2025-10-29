@@ -1,47 +1,38 @@
 // =================================================================
-// CABEÇALHO DA LOJA (Store Header)
+// COMPONENTE: Store Header (Principal)
 // =================================================================
-@use '../base/variables' as *; // Importa as variáveis SCSS
+@use '../base/variables' as *;
 @use '../base/mixins' as *;
 
-.store-header {
-  @include flex-center(row); // Ajustado para linha no header
-  justify-content: space-between; // Espaça os elementos
-  margin-bottom: 3rem;
-  text-align: center; // Mantém o fallback para centralização
-  background-color: $surface-color-light; // Usa a variável SCSS
-  transition: background-color 0.3s, border-color 0.3s;
-
-  body.dark-theme & {
-    background-color: $surface-color-dark; // Usa a variável SCSS
-  }
-
-  &__branding a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  &__logo {
-    height: 40px;
-    max-width: 150px;
-    object-fit: contain;
-    margin-right: 0.5rem;
-  }
-
-  &__title {
-    // Classe para o nome da loja se não houver logo
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: $primary-color; // Usa a variável SCSS
-  }
-
-  // --- Barra de Busca ---
-  &__search {
-    flex-grow: 1;
-    max-width: 500px;
-    position: relative;
-  }
+:host {
+  display: block;
+  width: 100%;
+  background-color: $surface-color-light;
+  box-shadow: $header-shadow;
+  padding: $header-padding-y $header-padding-x;
+  box-sizing: border-box;
+  transition: background-color $transition-duration-default, border-color $transition-duration-default;
+  z-index: $z-index-header; // Adicionado para garantir que o header fique por cima
+  position: relative; // Necessário para o z-index funcionar
 }
 
+// Ajuste para o tema escuro
+body.dark-theme :host {
+  background-color: $surface-color-dark;
+}
+
+// O contêiner principal dentro do componente
+.store-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: $container-max-width; // Usa variável global
+  margin: 0 auto;
+
+  // Importa os sub-componentes
+  @import 'store-header-branding';
+  @import 'store-header-search';
+  @import 'store-header-actions';
+}

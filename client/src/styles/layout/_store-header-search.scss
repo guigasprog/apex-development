@@ -1,0 +1,114 @@
+// =================================================================
+// PARCIAL: Busca do Header
+// =================================================================
+
+// Aninhado dentro de .store-header
+&__search {
+  flex-grow: 1;
+  max-width: $header-search-max-width; // Usa variável
+  position: relative;
+}
+
+.search-form {
+  display: flex;
+  width: 100%;
+  border-radius: $border-radius;
+  box-shadow: $header-shadow;
+
+  &__input {
+    flex-grow: 1;
+    height: $header-search-height; // Usa variável
+    padding: 0.6rem 1rem;
+    background-color: $bg-color-light;
+    color: $text-color-light;
+    border: none;
+    border-right: none;
+    border-radius: $border-radius 0 0 $border-radius;
+    font-size: 0.95rem;
+    outline: none;
+    transition: background-color $transition-duration-default, color $transition-duration-default, border-color $transition-duration-default;
+
+    // --- Dark Theme: Input ---
+    :host-context(body.dark-theme) & {
+      background-color: $bg-color-dark;
+      color: $text-color-dark;
+    }
+  }
+
+  &__button {
+    height: $header-search-height; // Usa variável
+    padding: 0.6rem 1rem;
+    border: 1px solid $primary-color;
+    background-color: $primary-color;
+    color: $text-color-dark; // Esta cor (branca) já contrasta bem com a primary-color
+    border-radius: 0 $border-radius $border-radius 0;
+    cursor: pointer;
+    transition: filter $transition-duration-micro ease-out;
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+
+    // Não é necessário um bloco dark-theme aqui,
+    // pois $primary-color e $text-color-dark são globais/contrastantes.
+  }
+}
+
+.autocomplete-results {
+  position: absolute;
+  top: calc(100%);
+  left: 25px;
+  right: 0;
+  background-color: $surface-color-light;
+  color: $text-color-light;
+  max-height: 250px;
+  max-width: 450px;
+  overflow-y: auto;
+  z-index: $z-index-autocomplete; // Usa variável
+  box-shadow: $card-shadow;
+  border-radius: 0 0 $border-radius $border-radius;
+  transition: background-color $transition-duration-default, border-color $transition-duration-default;
+
+  :host-context(body.dark-theme) & {
+    background-color: $bg-color-dark;
+    color: $text-color-dark;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color $transition-duration-fast ease-out;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: $surface-color-light;
+    }
+
+    // Estilos de hover para tema escuro aninhados (já existia)
+    :host-context(body.dark-theme) & {
+      border-bottom-color: $text-color-secondary-dark;
+
+      &:hover {
+        background-color: $surface-color-dark;
+      }
+    }
+  }
+}
+
+// Co-localização da Media Query para este parcial
+@media (max-width: $breakpoint-mobile) {
+  .store-header__search {
+    // Regras específicas de busca para mobile, se houver
+    // ex: order: 3; flex-basis: 100%;
+  }
+}

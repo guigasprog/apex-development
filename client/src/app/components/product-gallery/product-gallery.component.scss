@@ -1,0 +1,112 @@
+@use '../../../styles/base/variables' as *;
+
+.gallery-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: sticky;
+  top: 2rem;
+}
+
+// Wrapper da imagem principal
+.gallery-main-image-wrapper {
+  width: 100%;
+  height: 35rem; // A altura fixa que você definiu
+  max-height: 35rem;
+  border-radius: $border-radius;
+  box-shadow: $card-shadow;
+  background-color: $surface-color-light;
+
+  // --- ADICIONADO PARA O ZOOM ---
+  position: relative; // Fundamental para o posicionamento da imagem de zoom
+  overflow: hidden; // Esta é a "mágica" que cria o efeito de lupa
+  cursor: zoom-in;
+
+  &.is-zooming {
+    cursor: zoom-out;
+  }
+
+  :host-context(body.dark-theme) & {
+    background-color: $surface-color-dark;
+  }
+}
+
+// --- ESTILOS ATUALIZADOS/NOVOS ---
+
+.main-image,
+.zoomed-image {
+  // Estilos base que você tinha (para 'img')
+  width: 100%;
+  height: 100%; // Faz a imagem preencher o wrapper
+  object-fit: contain; // Respeita seu 'contain' original
+  border-radius: $border-radius; // Aplicado aqui em vez de no wrapper
+}
+
+.main-image {
+  transition: opacity 0.3s ease;
+
+  // Esconde a imagem principal quando o zoom está ativo
+  .is-zooming & {
+    opacity: 0;
+  }
+}
+
+.zoomed-image {
+  // Posicionada exatamente em cima da imagem principal
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  // Estado inicial (oculto e sem zoom)
+  opacity: 0;
+  transform: scale(1);
+  pointer-events: none; // Para não interferir nos eventos do mouse
+  transition: opacity 0.3s ease, transform 0.1s linear;
+
+    // Estado ATIVO (quando .is-zooming está no wrapper)
+  .is-zooming & {
+    opacity: 1;
+    transform: scale(2.5);
+    cursor: zoom-out; // Garante o cursor de zoom-out
+  }
+}
+
+
+// Lista de Thumbnails (Sem alteração)
+.gallery-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  .thumbnail-item {
+    width: 80px;
+    height: 80px;
+    border-radius: $border-radius / 2;
+    overflow: hidden;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: border-color 0.2s ease;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    &:hover {
+      border-color: $text-color-secondary-light;
+    }
+
+    &.active {
+      border-color: $primary-color;
+    }
+
+    :host-context(body.dark-theme) &:hover {
+      border-color: $text-color-secondary-dark;
+    }
+  }
+}

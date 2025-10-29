@@ -88,9 +88,8 @@ router.get('/autocomplete', async (req, res, next) => {
                 SELECT id, nome as name
                 FROM produtos
                 WHERE LOWER(nome) LIKE LOWER(?)
-                LIMIT 10`; // tenant_id is not needed as we are in the correct DB
+                LIMIT 10`; 
             
-            // CORRECTION: Use 'tenantDb' here, not 'db'
             tenantDb.all(query, [`%${searchTerm}%`], (err, rows) => {
                 if (err) reject(err);
                 resolve(rows);
@@ -127,11 +126,10 @@ router.get('/search', async (req, res, next) => {
                 FROM 
                     produtos p 
                 WHERE 
-                    p.tenant_id = ? AND 
                     (LOWER(p.nome) LIKE LOWER(?) OR LOWER(p.descricao) LIKE LOWER(?)) -- Busca no nome OU descrição
                 ORDER BY 
                     p.nome ASC`;
-            db.all(query, [req.tenant.id, `%${queryTerm}%`, `%${queryTerm}%`], (err, rows) => {
+            tenantDb.all(query, [`%${queryTerm}%`, `%${queryTerm}%`], (err, rows) => {
                 if (err) reject(err);
                 resolve(rows);
             });
@@ -143,6 +141,136 @@ router.get('/search', async (req, res, next) => {
     } finally {
         closeDbConnection(tenantDb, `tenant_${req.tenant?.id}.db`);
     }
+});
+
+// --- ADICIONADO: Rota POST /api/products/interactions ---
+router.post('/interactions', async (req, res, next) => {
+  if (!req.tenant || !req.tenant.id) {
+    return res.status(401).json({ error: 'Loja não identificada.' });
+  }
+
+  const { tipo, texto_busca, produto_id } = req.body;
+
+  if (!tipo || (tipo !== 'search' && tipo !== 'view')) {
+    return res.status(400).json({ error: 'Tipo de interação inválido. Deve ser "view" ou "search".' });
+  }
+  if (tipo === 'search' && (!texto_busca || texto_busca.trim() === '')) {
+    return res.status(400).json({ error: 'Texto de busca é obrigatório para o tipo "search".' });
+  }
+  if (tipo === 'view' && !produto_id) {
+    return res.status(400).json({ error: 'Produto ID é obrigatório para o tipo "view".' });
+  }
+
+  let tenantDb = null;
+  try {
+    tenantDb = await connectTenantDb(req.tenant.id);
+
+    await new Promise((resolve, reject) => {
+      const query = `
+        INSERT INTO produto_interacoes (produto_id, tipo, texto_busca) 
+        VALUES (?, ?, ?)
+      `;
+      
+      const params = [
+        tipo === 'view' ? produto_id : null, // produto_id é nulo se for 'search'
+        tipo,
+        tipo === 'search' ? texto_busca : null // texto_busca é nulo se for 'view'
+      ];
+
+      // Use .run() para queries de INSERT/UPDATE/DELETE
+      tenantDb.run(query, params, function(err) { 
+        if (err) {
+          return reject(err);
+        }
+        resolve({ id: this.lastID }); // Retorna o ID da linha inserida
+      });
+    });
+
+    res.status(201).json({ message: 'Interação registrada com sucesso.' });
+
+  } catch (error) {
+    console.error("Erro ao registrar interação:", error);
+    next(error);
+  } finally {
+    closeDbConnection(tenantDb, `tenant_${req.tenant?.id}.db`);
+  }
+});
+
+router.get('/:id', async (req, res, next) => {
+  if (!req.tenant || !req.tenant.id) {
+    return res.status(401).json({ error: 'Loja não identificada.' });
+  }
+  
+  const { id } = req.params;
+  let tenantDb = null;
+
+  try {
+    tenantDb = await connectTenantDb(req.tenant.id);
+    
+    // 1. Busca os dados principais E as especificações do produto
+    const product = await new Promise((resolve, reject) => {
+      // CORREÇÃO: Adicionadas as colunas de especificação
+      const query = `
+        SELECT id, nome as name, descricao as description, preco as price,
+               peso_kg, comprimento_cm, largura_cm, altura_cm 
+        FROM produtos 
+        WHERE id = ?`;
+      
+      tenantDb.get(query, [id], (err, row) => {
+        if (err) return reject(err);
+        resolve(row);
+      });
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Produto não encontrado.' });
+    }
+
+    // 2. Busca as imagens do produto (Lógica mantida)
+    const images = await new Promise((resolve, reject) => {
+      const query = `SELECT image_url, descricao FROM imagens_produto WHERE produto_id = ? ORDER BY id ASC`;
+      tenantDb.all(query, [id], (err, rows) => {
+        if (err) return reject(err);
+        resolve(rows || []);
+      });
+    });
+
+    // 3. CORREÇÃO: Removemos a query à tabela 'produto_especificacoes'
+    // Em vez disso, formatamos os dados que já buscamos
+    
+    const specifications = [];
+    if (product.peso_kg) {
+      specifications.push({ nome: 'Peso', valor: `${product.peso_kg} kg` });
+    }
+    if (product.comprimento_cm) {
+      specifications.push({ nome: 'Comprimento', valor: `${product.comprimento_cm} cm` });
+    }
+    if (product.largura_cm) {
+      specifications.push({ nome: 'Largura', valor: `${product.largura_cm} cm` });
+    }
+    if (product.altura_cm) {
+      specifications.push({ nome: 'Altura', valor: `${product.altura_cm} cm` });
+    }
+    
+    // 4. Limpa as colunas originais do objeto produto para não duplicar dados
+    delete product.peso_kg;
+    delete product.comprimento_cm;
+    delete product.largura_cm;
+    delete product.altura_cm;
+
+    // 5. Combina tudo e envia
+    res.json({
+      ...product,
+      images: images,
+      specifications: specifications // Envia o array formatado
+    });
+
+  } catch (error) {
+    console.error(`Erro ao buscar produto ${id}:`, error);
+    next(error);
+  } finally {
+    closeDbConnection(tenantDb, `tenant_${req.tenant?.id}.db`);
+  }
 });
 
 export default router;

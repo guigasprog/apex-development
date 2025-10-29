@@ -12,26 +12,35 @@
 .btn {
   border: none;
   padding: 12px 15px;
-  border-radius: $border-radius; // Usa a variável SCSS
+  height: 44px;
+  border-radius: $border-radius;
   cursor: pointer;
   font-weight: bold;
-  font-family: inherit; // Herda a fonte base
+  font-family: inherit;
   transition: all 0.2s ease-out;
 
   &--primary {
-    background-color: $primary-color; // Usa a variável SCSS
-    color: white; // Assume contraste bom com cores primárias
+    background-color: $primary-color;
+    color: white;
     flex-grow: 1;
   }
 
   &--secondary {
     @include flex-center();
     background-color: transparent;
-    border: 1px solid $secondary-color; // Usa a variável SCSS
-    color: $secondary-color; // Usa a variável SCSS
+    border: 1px solid $secondary-color;
+    color: $secondary-color;
     width: 44px;
     height: 44px;
     padding: 0;
     font-size: 1.2rem;
+
+    // --- Estado Ativo: Favorito ---
+    &.is-favorite {
+      color: $surface-color-light;
+      background-color: $secondary-color;
+
+    }
+
   }
 }
