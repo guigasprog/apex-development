@@ -109,14 +109,14 @@ class StoreSettingsForm extends TPage
         $preview->id = 'store-preview';
         $preview->style = 'padding: 20px; border-radius: 8px; transition: all 0.3s; display: flex; align-items: center; justify-content: center;';
         $preview->add('
-            <div id="preview-card" style="border-radius: 8px; overflow: hidden; max-width: 250px; font-family: Inter, sans-serif; transition: all 0.2s ease-in-out;">
+            <div class="product-card" style="border-radius: 8px; overflow: hidden; max-width: 250px; font-family: Inter, sans-serif; transition: all 0.2s ease-in-out;">
                 <img id="preview-logo" src="https://api.iconify.design/ph:mouse-duotone.svg?color=%23888888" alt="Produto" style="width:100%; height: 180px; object-fit: contain; padding: 10px; transition: background-color 0.3s;">
                 <div style="padding: 15px;">
                     <h4 class="preview-title" style="margin-top:0"><b>Seu Produto</b></h4> 
                     <p>Este é um card de exemplo do seu e-commerce.</p> 
                     <div style="display: flex; gap: 10px; align-items: center;">
-                       <button id="preview-button-primary" style="flex-grow: 1; border: none; padding: 10px; color: white; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out;">Botão Primário</button>
-                       <button id="preview-button-secondary" style="flex-shrink: 0; width: 40px; height: 40px; border: 1px solid #555; padding: 10px; color: #555; background-color: transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out; display: flex; align-items: center; justify-content: center;">
+                       <button class="btn btn--primary" style="flex-grow: 1; border: none; padding: 10px; color: white; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out;">Botão Primário</button>
+                       <button class="btn btn--secondary" style="flex-shrink: 0; width: 40px; height: 40px; border: 1px solid #555; padding: 10px; color: #555; background-color: transparent; border-radius: 8px; cursor: pointer; transition: all 0.2s ease-in-out; display: flex; align-items: center; justify-content: center;">
                            <i class="fa fa-heart"></i>
                        </button>
                     </div>
@@ -156,7 +156,9 @@ class StoreSettingsForm extends TPage
             $style->add($hover->css_code . "\n");
         }
         // Adiciona a transição padrão para suavidade
-        $style->add("#preview-card, #preview-button-primary, #preview-button-secondary { transition: all 0.2s ease-out; }");
+        $style->add("
+            .product-card, .btn {transition: all 0.2s ease-out;}
+        ");
         parent::add($style);
 
         // Prepara os mapas de dados para o JavaScript
@@ -214,23 +216,23 @@ class StoreSettingsForm extends TPage
                 // Estilos base
                 $('#store-preview').css('background-color', is_dark ? '#252527' : '#f8f9fa');
                 $('#store-preview').css('border-color', is_dark ? '#a1a1aa' : '#dee2e6');
-                $('#preview-card').css('background-color', is_dark ? '#3C3B3E' : '#ffffff');
-                $('#preview-card').css('color', is_dark ? '#f5f5f5' : '#343a40');
-                $('#preview-card').css('border', is_dark ? 'none' : '1px solid #dee2e6');
+                $('.product-card').css('background-color', is_dark ? '#3C3B3E' : '#ffffff');
+                $('.product-card').css('color', is_dark ? '#f5f5f5' : '#343a40');
+                $('.product-card').css('border', is_dark ? 'none' : '1px solid #dee2e6');
                 $('#preview-logo').css('background-color', is_dark ? '#504f52' : '#f0f0f0');
                 
                 // Cores
                 var primary_color_name = $('select[name=primary_color]').val();
                 if (primary_color_name && allColorsMap[primary_color_name]) {
                     var final_primary_color = allColorsMap[primary_color_name][currentTheme];
-                    $('#preview-button-primary').css('background-color', final_primary_color);
+                    $('.btn--primary').css('background-color', final_primary_color);
                 }
 
                 var secondary_color_name = $('select[name=secondary_color]').val();
                 if (secondary_color_name && allColorsMap[secondary_color_name]) {
                     var final_secondary_color = allColorsMap[secondary_color_name][currentTheme];
-                    $('#preview-button-secondary').css('border-color', final_secondary_color);
-                    $('#preview-button-secondary > i').css('color', final_secondary_color);
+                    $('.btn--secondary').css('border-color', final_secondary_color);
+                    $('.btn--secondary > i').css('color', final_secondary_color);
                 }
                 
                 // Fonte
@@ -241,38 +243,57 @@ class StoreSettingsForm extends TPage
                 
                 // Arredondamento
                 var border_radius = $('input[name=border_radius_px]').val() + 'px';
-                $('#preview-card, #preview-button-primary, #preview-button-secondary').css('border-radius', border_radius);
+                $('.product-card, .btn--primary, .btn--secondary').css('border-radius', border_radius);
 
                 // Sombra
                 var has_shadow = $('input[name=has_box_shadow]:checked').val() == '1';
                 var final_shadow = 'none';
                 if (has_shadow) {
                     var shadow_color = is_dark ? 'rgba(0, 0, 0, 0.4)' : 'rgba(0,0,0,0.15)';
-                    final_shadow = '0 4px 16px 0 ' + shadow_color;
+                    final_shadow = '0 4px 12px 0 ' + shadow_color;
                 }
-                $('#preview-card').css('box-shadow', final_shadow);
+                $('.product-card').css('box-shadow', final_shadow);
 
                 // Efeito Hover
                 var hover_effect = $('select[name=hover_effect]').val();
-                $('#preview-card, #preview-button-primary, #preview-button-secondary').removeClass (function (index, className) {
+            
+                // 1. Seleciona os elementos do preview
+                var \$previewElements = $('.product-card, .btn--primary, .btn--secondary');
+
+                // 2. Limpa QUALQUER classe de hover-effect anterior
+                // (Esta sua regex já estava correta)
+                \$previewElements.removeClass (function (index, className) {
                     return (className.match (/(^|\\s)hover-effect-\\S+/g) || []).join(' ');
                 });
-                
-                if (hover_effect !== 'none') {
-                    if (hover_effect === 'default') {
-                        $('#preview-card').addClass('hover-effect-default-card');
-                        $('#preview-button-primary, #preview-button-secondary').addClass('hover-effect-default-button');
-                    }
-                    else if (hover_effect === 'glow') {
+
+                // 3. Adiciona as classes base (que o CSS da imagem espera)
+                // O código antigo removia e adicionava isso de forma inconsistente.
+                // Agora garantimos que elas sempre existam.
+                $('#preview-card').addClass('product-card');
+                $('#preview-button-primary, #preview-button-secondary').addClass('btn');
+
+                // 4. Aplica a nova classe de efeito (se não for 'none')
+                if (hover_effect && hover_effect !== 'none') {
+                    
+                    // Lógica especial para 'glow' (parece ser dinâmica, o que é bom)
+                    if (hover_effect === 'glow') {
+                        // Pega a cor primária que já foi aplicada no preview
+                        var final_primary_color = $('#preview-button-primary').css('background-color');
                         var glow_color = is_dark ? 'rgba(255, 255, 255, 0.1)' : final_primary_color;
-                        document.documentElement.style.setProperty('--shadow-color', glow_color);
-                        $('#preview-card').addClass('hover-effect-glow');
+                        
+                        // Define a variável CSS que o 'hover-effect-glow' (injetado pelo PHP) vai usar
+                        document.documentElement.style.setProperty('--primary-color-glow', glow_color);
+                        
+                        // Adiciona a classe
+                        \$previewElements.addClass('hover-effect-glow');
                     }
                     else {
-                        $('#preview-card, #preview-button-primary, #preview-button-secondary').addClass('hover-effect-' + hover_effect);
+                        // Lógica Padrão (CORRIGIDA):
+                        // Aplica a classe para 'default' e qualquer outro efeito.
+                        // Ex: 'hover-effect-default', 'hover-effect-lift', etc.
+                        \$previewElements.addClass('hover-effect-' + hover_effect);
                     }
                 }
-                // --- FIM DO CÓDIGO COMPLETADO ---
             }
             
             // Listeners

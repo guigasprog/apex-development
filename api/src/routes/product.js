@@ -11,32 +11,68 @@ router.get('/', async (req, res, next) => {
         return res.status(404).json({ error: 'Loja não identificada. Acesso via subdomínio necessário.' });
     }
 
-    let tenantDb = null; // Guarda a conexão específica do tenant
+    let tenantDb = null;
     try {
         tenantDb = await connectTenantDb(req.tenant.id); // Conecta ao banco correto!
 
-        const products = await new Promise((resolve, reject) => {
+        // 1. Busca todos os produtos JÁ COM a categoria
+        const productsWithCategories = await new Promise((resolve, reject) => {
             const query = `
                 SELECT
                     p.id, p.nome as name, p.descricao as description, p.preco as price,
-                    (SELECT pi.image_url FROM imagens_produto pi WHERE pi.produto_id = p.id ORDER BY pi.id LIMIT 1) as main_image_url
+                    (SELECT pi.image_url FROM imagens_produto pi WHERE pi.produto_id = p.id ORDER BY pi.id LIMIT 1) as main_image_url,
+                    
+                    COALESCE(c.nome, 'Alguns de nossos produtos') as category_name,
+                    
+                    -- --- CORREÇÃO AQUI ---
+                    -- Checa se c.id é nulo (o que significa que o LEFT JOIN falhou)
+                    CASE WHEN c.id IS NULL THEN 1 ELSE 0 END AS category_sort_order
                 FROM
                     produtos p
+                LEFT JOIN
+                    categorias c ON p.categoria_id = c.id
                 ORDER BY
-                    p.nome ASC`; // tenant_id não é mais necessário na query, pois já estamos no DB certo
-            tenantDb.all(query, [], (err, rows) => { // Não precisa mais do tenant_id aqui
+                    category_sort_order ASC, -- "Sem categoria" (1) vem depois das reais (0)
+                    category_name ASC,
+                    p.nome ASC
+            `;
+            
+            tenantDb.all(query, [], (err, rows) => {
                 if (err) reject(err);
-                resolve(rows);
+                resolve(rows || []);
             });
         });
-        res.json(products || []);
+
+        // 2. Processa a lista plana em grupos
+        const groupedProducts = new Map();
+
+        for (const product of productsWithCategories) {
+            const categoryName = product.category_name;
+
+            if (!groupedProducts.has(categoryName)) {
+                groupedProducts.set(categoryName, {
+                    categoryName: categoryName,
+                    products: []
+                });
+            }
+
+            const group = groupedProducts.get(categoryName);
+            
+            delete product.category_name;
+            delete product.category_sort_order;
+            
+            group.products.push(product);
+        }
+
+        // 3. Converte os valores do Map em um array
+        const finalGroupedArray = Array.from(groupedProducts.values());
+
+        res.json(finalGroupedArray);
 
     } catch (error) {
         console.error(`Erro ao buscar produtos para tenant ${req.tenant.id}:`, error);
-        // Passa o erro para o error handler do Express
-        next(error); // É melhor usar next(error) do que res.status(500) aqui
+        next(error);
     } finally {
-        // Garante que a conexão com o banco do tenant seja fechada
         closeDbConnection(tenantDb, `tenant_${req.tenant?.id}.db`);
     }
 });
@@ -110,7 +146,7 @@ router.get('/search', async (req, res, next) => {
         return res.status(401).json({ error: 'Loja não identificada.' });
     }
     
-    const queryTerm = req.query.q; // Pega o termo da query string ?q=...
+    const queryTerm = req.query.q;
     if (!queryTerm) {
         return res.status(400).json({ error: 'Termo de busca não fornecido.' });
     }
@@ -126,7 +162,7 @@ router.get('/search', async (req, res, next) => {
                 FROM 
                     produtos p 
                 WHERE 
-                    (LOWER(p.nome) LIKE LOWER(?) OR LOWER(p.descricao) LIKE LOWER(?)) -- Busca no nome OU descrição
+                    (LOWER(p.nome) LIKE LOWER(?) OR LOWER(p.descricao) LIKE LOWER(?))
                 ORDER BY 
                     p.nome ASC`;
             tenantDb.all(query, [`%${queryTerm}%`, `%${queryTerm}%`], (err, rows) => {

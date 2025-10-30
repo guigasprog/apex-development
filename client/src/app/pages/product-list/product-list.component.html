@@ -1,0 +1,37 @@
+<div style="width: 80%; margin: 3rem auto;">
+
+  <div *ngIf="productGroups$ | async as groups; else loading">
+
+    <div *ngIf="!error">
+      <div *ngIf="groups.length === 0" class="empty-list">
+        <p>Nenhum produto encontrado nesta loja.</p>
+      </div>
+
+      <section class="product-group" *ngFor="let group of groups">
+        <h2 class="product-group__title">{{ group.categoryName }}</h2>
+
+        <app-product-grid [products]="group.products" />
+      </section>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">
+    <p>{{ error }}</p>
+  </div>
+
+</div>
+
+
+<ng-template #loading>
+  <div class="skeleton-list-container" style="width: 80%; margin: 3rem auto;">
+    <section class="product-group">
+      <h2 class="product-group__title skeleton-title"></h2>
+      <app-product-grid [isLoading]="true" />
+    </section>
+
+    <section class="product-group">
+      <h2 class="product-group__title skeleton-title"></h2>
+      <app-product-grid [isLoading]="true" />
+    </section>
+  </div>
+</ng-template>

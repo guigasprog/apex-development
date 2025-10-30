@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from '../models/product.model'; // Importa a interface
+import { Product, ProductGroup } from '../models/product.model'; // Importa a interface
 import { environment } from '../../environments/environment'; // Para a URL da API
 
 export interface ProductInteraction {
@@ -33,10 +33,10 @@ export class ProductService {
   /**
    * Busca a lista de produtos da loja atual (identificada pela API via subdomínio).
    */
-  getProducts(): Observable<Product[]> {
+  getProducts(): Observable<ProductGroup[]> {
     // A API /api/tenant/products já sabe qual tenant buscar pelo middleware
     const url = `${this.apiUrl}`;
-    return this.http.get<Product[]>(url);
+    return this.http.get<ProductGroup[]>(url);
   }
 
   /**

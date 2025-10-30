@@ -65,7 +65,7 @@
   max-width: 450px;
   overflow-y: auto;
   z-index: $z-index-autocomplete; // Usa variável
-  box-shadow: $card-shadow;
+  box-shadow: $header-shadow;
   border-radius: 0 0 $border-radius $border-radius;
   transition: background-color $transition-duration-default, border-color $transition-duration-default;
 
@@ -85,6 +85,7 @@
     cursor: pointer;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     transition: background-color $transition-duration-fast ease-out;
+    background-color: $bg-color-light;
 
     &:last-child {
       border-bottom: none;
@@ -97,6 +98,7 @@
     // Estilos de hover para tema escuro aninhados (já existia)
     :host-context(body.dark-theme) & {
       border-bottom-color: $text-color-secondary-dark;
+      background-color: $bg-color-dark;
 
       &:hover {
         background-color: $surface-color-dark;

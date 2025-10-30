@@ -39,7 +39,12 @@
     &.is-favorite {
       color: $surface-color-light;
       background-color: $secondary-color;
+    }
 
+    body.dark-theme & {
+      &.is-favorite {
+        color: $surface-color-dark;
+      }
     }
 
   }

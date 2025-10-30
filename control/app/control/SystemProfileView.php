@@ -60,12 +60,8 @@ class SystemProfileView extends TPage
                     // Adiciona a propriedade 'nome_loja' ao objeto de dados
                     $data_to_set->nome_loja = $tenant->nome_loja;
 
-                    $slug = strtolower($tenant->nome_loja);
-                    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
-                    $slug = trim($slug, '-');
-                    
                     $base_domain = 'vibevault.com:4200';
-                    $url = "http://{$slug}.{$base_domain}";
+                    $url = "http://{$tenant->slug}.{$base_domain}";
 
                     $link = new TElement('a');
                     $link->href = $url;

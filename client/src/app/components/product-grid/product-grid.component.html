@@ -1,0 +1,16 @@
+<div class="skeleton-grid" *ngIf="isLoading">
+  <div class="skeleton-card" *ngFor="let i of dummySkeletonCards">
+    <div class="skeleton-image"></div>
+    <div class="skeleton-text skeleton-title"></div>
+    <div class="skeleton-text skeleton-price"></div>
+  </div>
+</div>
+
+<div class="product-grid" *ngIf="!isLoading && products.length > 0">
+  <app-product-card *ngFor="let product of products" [product]="product">
+  </app-product-card>
+</div>
+
+<div class="empty-grid" *ngIf="!isLoading && (!products || products.length === 0)">
+  <p>Nenhum produto encontrado.</p>
+</div>

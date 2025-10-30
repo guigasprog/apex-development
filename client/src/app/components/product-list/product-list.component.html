@@ -1,7 +1,0 @@
-<div class="product-list__container">
-  @for (product of products; track product.id) {
-  <app-product-card [product]="product"></app-product-card>
-  } @empty {
-  <p class="product-list__empty-message">Nenhum produto encontrado nesta loja ainda.</p>
-  }
-</div>

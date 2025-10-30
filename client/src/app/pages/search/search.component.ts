@@ -4,16 +4,16 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductInteraction, ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
-import { ProductListComponent } from '../../components/product-list/product-list.component';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { Observable, of, Subscription } from 'rxjs';
+import {  of, Subscription } from 'rxjs';
+import { ProductGridComponent } from '../../components/product-grid/product-grid.component';
 
 @Component({
   selector: 'app-search',
   standalone: true,
   imports: [
     CommonModule,
-    ProductListComponent
+    ProductGridComponent
   ],
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']

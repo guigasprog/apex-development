@@ -1,0 +1,65 @@
+// Em product-list.component.scss
+@use '../../../styles/base/variables' as *;
+@use '../../../styles/base/mixins' as *;
+
+.product-group {
+  margin-bottom: 3rem; // Espaçamento entre categorias
+
+  &__title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: $text-color-light;
+
+    // Um destaque visual para o título
+    border-bottom: 2px solid $primary-color;
+    padding-bottom: 0.5rem;
+    display: inline-block;
+
+    :host-context(body.dark-theme) & {
+      color: $text-color-dark;
+    }
+  }
+}
+
+
+.skeleton-title {
+  height: 28px; // Altura aproximada do seu h2
+  width: 40%; // Largura de exemplo
+  background-color: $surface-color-light;
+  border-radius: $border-radius;
+  box-shadow: $header-shadow;
+  position: relative;
+  overflow: hidden;
+
+  // Animação de "shimmer" (brilho)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  :host-context(body.dark-theme) & {
+    background-color: $surface-color-dark;
+
+    &::before {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+    }
+  }
+}
+
+// Keyframes da animação (pode estar no seu CSS global)
+@keyframes shimmer {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(200%);
+  }
+}

@@ -1,4 +1,9 @@
 
+export interface ProductGroup {
+  categoryName: string;
+  products: Product[];
+}
+
 export interface Product {
   id: number;
   name: string;
