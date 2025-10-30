@@ -1,27 +1,48 @@
-# VibeVault
+# VibeVault - Client (Frontend)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.4.
+Este diretório contém a aplicação frontend do VibeVault, desenvolvida com **Angular**.
 
-## Development server
+## Pré-requisitos
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Node.js (v16 ou superior)
+- NPM
+- Angular CLI (Instale com `npm install -g @angular/cli`)
 
-## Code scaffolding
+## Configuração
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Antes de executar, você precisa configurar a URL da API que esta aplicação irá consumir.
 
-## Build
+1.  Abra o arquivo: `client/src/environments/environment.ts`
+2.  Localize a propriedade `apiUrl` (ou similar) e defina a URL onde sua API (`/api`) está sendo executada.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+**Exemplo (`environment.ts`):**
 
-## Running unit tests
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: "http://localhost:3000/api", // Certifique-se que esta é a URL correta da sua API
+};
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Instalação
 
-## Running end-to-end tests
+1.  Navegue até o diretório:
+    ```bash
+    cd client
+    ```
+2.  Instale as dependências:
+    ```bash
+    npm install
+    ```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Executando a Aplicação
 
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1.  Para iniciar o servidor de desenvolvimento (geralmente na porta `4200`):
+    ```bash
+    ng serve
+    ```
+    (Ou utilize o script padrão do `package.json`, se houver):
+    ```bash
+    npm start
+    ```
+2.  Abra seu navegador em `http://localhost:4200/`.
